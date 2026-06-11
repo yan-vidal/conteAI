@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "1.0",
+  "tiers": {
+    "fast": {
+      "triggers": ["post-edit", "pre-commit"],
+      "timeoutMs": 30000
+    },
+    "standard": {
+      "triggers": ["pre-done"],
+      "timeoutMs": 120000
+    },
+    "slow": {
+      "triggers": ["pre-push", "pre-pr", "manual"],
+      "timeoutMs": 600000
+    }
+  },
+  "checks": {
+    "biome": {
+      "enabled": true,
+      "tier": "fast"
+    },
+    "knip": {
+      "enabled": true,
+      "tier": "standard"
+    },
+    "deps-diff": {
+      "enabled": true,
+      "tier": "fast"
+    },
+    "eslint": {
+      "enabled": true,
+      "tier": "standard",
+      "targets": ["apps/web"]
+    }
+  },
+  "baseline": {
+    "path": ".sentiness/baseline.json"
+  },
+  "pending": {
+    "path": ".sentiness/pending-feedback.json"
+  },
+  "reporting": {
+    "compact": false,
+    "omitOk": true,
+    "warningsAreErrors": false
+  }
+}

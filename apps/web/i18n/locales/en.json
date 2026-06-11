@@ -1,0 +1,7 @@
+{
+  "home": {
+    "eyebrow": "Gallery rebuild",
+    "title": "ConteAI Photography",
+    "subtitle": "Server-rendered Nuxt foundation for porting the gallery without breaking existing public links."
+  }
+}
