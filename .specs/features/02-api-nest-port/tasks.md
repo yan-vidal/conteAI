@@ -87,6 +87,7 @@ T6 + T7 + T8 + T12 + T13 + T14 + T15 -> T16
 
 ### T2 — Contract test harness and fixtures
 
+**Status:** [x] concluida em 2026-06-12.  
 **What:** Create a reusable API test harness with isolated MongoDB, app boot helper, auth helper, and fixtures that encode the legacy response shapes before implementation starts.  
 **Where:** `apps/api/test/support/`, `apps/api/test/fixtures/`, `apps/api/vitest.config.ts`  
 **Depends on:** T1  
@@ -105,6 +106,8 @@ T6 + T7 + T8 + T12 + T13 + T14 + T15 -> T16
 **Tests:** integration harness  
 **Gate:** API quick + Sentiness post-edit  
 **Commit:** `test(api): add contract harness fixtures`
+
+**Implementation notes:** `createApiTestApp` compila `AppModule`, aplica a mesma configuracao global de bootstrap via `configureApiApp`, e usa `app.init()`; `api-fixtures.ts` fixa user/tag/geo/image/list/auth shapes; `auth-helper.ts` fica pronto para T5; `mongo-memory.ts` fica pronto para T3.
 
 ---
 
