@@ -139,6 +139,7 @@ T6 + T7 + T8 + T12 + T13 + T14 + T15 -> T16
 
 ### T4 — Image URL/key mapping helpers
 
+**Status:** [x] concluida em 2026-06-12.  
 **What:** Implement pure helpers for outbound `BUCKET_URL` prefixing and inbound absolute URL stripping, preserving the relative-key-in-DB convention.  
 **Where:** `apps/api/src/images/image-url.service.ts`, `apps/api/src/images/image-url.service.spec.ts`  
 **Depends on:** T2  
@@ -156,6 +157,8 @@ T6 + T7 + T8 + T12 + T13 + T14 + T15 -> T16
 **Tests:** unit  
 **Gate:** API quick + Sentiness post-edit  
 **Commit:** `feat(api): preserve image url mapping`
+
+**Implementation notes:** helpers return cloned documents, avoid double-prefixing `http(s)` URLs, and strip absolute URLs back to the last path segment to preserve the legacy PATCH convention.
 
 ---
 
