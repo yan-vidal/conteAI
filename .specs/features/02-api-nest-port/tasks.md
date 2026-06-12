@@ -113,6 +113,7 @@ T6 + T7 + T8 + T12 + T13 + T14 + T15 -> T16
 
 ### T3 — Database module, schemas, and repositories
 
+**Status:** [x] concluida em 2026-06-12.  
 **What:** Port the Mongo/Mongoose model layer to Nest: `Image`, `Tag`, `Country`, `State`, `City`, and `User`, with typed repositories or model providers used by feature modules.  
 **Where:** `apps/api/src/database/`, `apps/api/src/images/image.schema.ts`, `apps/api/src/tags/tag.schema.ts`, `apps/api/src/geo/*.schema.ts`, `apps/api/src/auth/user.schema.ts`  
 **Depends on:** T2  
@@ -131,6 +132,8 @@ T6 + T7 + T8 + T12 + T13 + T14 + T15 -> T16
 **Tests:** integration  
 **Gate:** API full + Sentiness post-edit  
 **Commit:** `feat(api): add mongoose schemas`
+
+**Implementation notes:** `DatabaseModule` provides `MongooseModule.forRootAsync` from normalized config; schemas preserve legacy model names/collections and nested image/color/metadata shape; `database.module.spec.ts` inserts and reads user/tag/country/state/city/image through `mongodb-memory-server`.
 
 ---
 
