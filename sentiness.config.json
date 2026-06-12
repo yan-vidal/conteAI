@@ -31,6 +31,10 @@
       "enabled": true,
       "tier": "standard",
       "targets": ["apps/web"]
+    },
+    "playwright": {
+      "enabled": true,
+      "tier": "slow"
     }
   },
   "baseline": {
