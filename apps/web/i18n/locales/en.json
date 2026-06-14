@@ -1,7 +1,23 @@
 {
+  "gallery": {
+    "eyebrow": "Public gallery",
+    "title": "ConteAI Gallery"
+  },
+  "header": {
+    "toggleTheme": "Toggle theme"
+  },
   "home": {
     "eyebrow": "Gallery rebuild",
     "title": "ConteAI Photography",
     "subtitle": "Server-rendered Nuxt foundation for porting the gallery without breaking existing public links."
+  },
+  "list": {
+    "eyebrow": "Administration"
+  },
+  "login": {
+    "eyebrow": "Restricted access"
+  },
+  "upload": {
+    "eyebrow": "Administration"
   }
 }

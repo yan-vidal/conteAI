@@ -90,7 +90,7 @@ Status: [ ] pendente · [x] concluida. Gates: `pnpm --filter api test` (API), `p
 **Depende de:** P2.
 **Done when:** rotas resolvem; `/upload` e `/list` redirecionam sem token; deep-link query preservada.
 **Commit:** `feat(web): routes and auth middleware`
-- [ ]
+- [x] concluida em 2026-06-14. `/` redireciona para `/gallery`; `/gallery` preserva query de deep-link; `/secretdoor`, `/upload` e `/list` existem; `/upload` e `/list` usam middleware `auth` e redirecionam sem token; HeaderBar com toggle de tema portado. Verificado com `pnpm --filter web test` (7 testes), `pnpm --filter web lint`, `pnpm --filter web typecheck` sob Node 26 e Sentiness fast `ok`.
 
 ## P4 — Web: porte da matemática `resize()` do modal (RV4)
 **O que:** portar a função pura de `tests/legacy-resize/legacyResize.ts` para `apps/web` e provar contra a fixture de characterization (valores idênticos ao legado).

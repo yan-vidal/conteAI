@@ -12,6 +12,7 @@
 - **F3 — breakdown do porte completo criado** em `.specs/features/03-web-nuxt-favoritas/tasks.md` (seção "Porte completo (execução)", tarefas P1–P10).
 - **F3 P1 — API favoritas** (commit `d47cbfb`): `favorite?: boolean` (default false) em `Image` + `@conteai/shared`; `GET /images?favorite=true|false`; upload/edit aceitam `favorite`. 79 testes da API verdes.
 - **F3 P2 — Fundação web** (commit `9b1275a`): `apps/web/composables/useApi.ts` (tipado, `NUXT_PUBLIC_API_URL`, token), stores Pinia `auth`/`theme` (setup-syntax, persistidas via `@pinia-plugin-persistedstate/nuxt`); `@conteai/shared` é dep do web. 4 testes web verdes.
+- **F3 P3 — Rotas + auth middleware**: `/`→`/gallery`, `/gallery` público preservando query de deep-link, `/secretdoor`, `/upload` e `/list`; `auth` middleware exige token Pinia para `/upload`/`/list`; HeaderBar com toggle de tema. 7 testes web verdes, lint/typecheck web verdes sob Node 26, Sentiness fast `ok`.
 
 ## Decisões de execução da F3 (adotadas das sugestões da spec)
 
@@ -20,9 +21,8 @@
 
 ## Next Step
 
-**Retomar a F3 na tarefa P3** (ver `tasks.md`). Ordem sugerida: P3 → P4 → P7 → P5 → P6 → P8 → P9 → P10.
+**Retomar a F3 na tarefa P4** (ver `tasks.md`). Ordem sugerida: P4 → P7 → P5 → P6 → P8 → P9 → P10.
 
-- **P3** rotas + middleware de auth (`/`→`/gallery`, `/secretdoor`, `/upload`/`/list` client-only com token Pinia) + layout base/HeaderBar.
 - **P4** portar `resize()` de `tests/legacy-resize/legacyResize.ts` para `apps/web` e provar contra a fixture golden.
 - **P5** GalleryView (filtros cascata, infinite scroll, sync URL, SSR 1ª página via `useAsyncData`, default favoritas + toggle `?all=true` + empty-state, deep-link R11). **Ordenação default `metadata.takenAt desc` é invariante.**
 - **P6** ModalViewerImage (usa P4) · **P7** Login · **P8** Upload · **P9** List/Edit · **P10** regressão visual vs goldens + Vitest + aceitação.
