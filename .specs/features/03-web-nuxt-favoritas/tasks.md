@@ -118,7 +118,7 @@ Status: [ ] pendente · [x] concluida. Gates: `pnpm --filter api test` (API), `p
 **Depende de:** P2, P3.
 **Done when:** login válido autentica e libera `/upload` e `/list`; inválido mostra erro.
 **Commit:** `feat(web): login view`
-- [ ]
+- [x] concluida em 2026-06-14. `/secretdoor` tem formulário i18n, chama `auth.login()`/`POST /authentication`, grava token/payload no Pinia, redireciona para `/list` em sucesso e mostra erro em credenciais inválidas. Verificado com `pnpm --filter web test` (10 testes), `pnpm --filter web lint`, `pnpm --filter web typecheck` sob Node 26 e Sentiness fast `ok`.
 
 ## P8 — Web: Upload (client-only) (R4, R10)
 **O que:** multi-arquivo com versionNames, checkbox Original, checkbox Favorita (default marcado), descrição → `POST /images` multipart; feedback/erros.

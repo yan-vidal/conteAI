@@ -1,4 +1,9 @@
 {
+  "$vuetify": {
+    "input": {
+      "appendAction": "append action"
+    }
+  },
   "gallery": {
     "eyebrow": "Public gallery",
     "title": "ConteAI Gallery"
@@ -15,7 +20,10 @@
     "eyebrow": "Administration"
   },
   "login": {
-    "eyebrow": "Restricted access"
+    "eyebrow": "Restricted access",
+    "name": "User",
+    "password": "Password",
+    "submit": "Sign in"
   },
   "upload": {
     "eyebrow": "Administration"
