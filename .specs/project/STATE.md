@@ -27,7 +27,7 @@ Histórico: mapeamento brownfield + decisões fechadas + specs F1–F7 + passada
 - 2026-06-11 — **Lint híbrido:** Biome substitui ESLint+Prettier em `apps/api`/`packages/shared` (e alimenta o `check-biome` do Sentiness); ESLint+eslint-plugin-vue só em `apps/web` (suporte do Biome a .vue ainda experimental, sem regras específicas de Vue). Primeira issue publicada: `@sentiness/check-eslint` → https://github.com/Arateki/Sentiness/issues/1 (texto em `.specs/issues/sentiness-check-eslint.md`).
 
 - 2026-06-14 — **F2 concluída:** porte da API NestJS com paridade de contrato + correções aprovadas (ver `acceptance.md`). Geo/tags/imagens não-existentes retornam 404; `GET /images` com allowlist anti-injeção; upload usa EXIF do `Original`.
-- 2026-06-14 — **Sentiness baseline reinicializado:** `.sentiness/baseline.json` estava vazio; com decisão do Yan, rodado `sentiness baseline init` (25 falsos-positivos pré-existentes do knip suprimidos: deps Nuxt, `multer`, `@sentiness/check-*`, `eslint`). `newInDiff` limpo. Issue de dogfooding a abrir: knip sem suporte a Nuxt/deps dinâmicas.
+- 2026-06-14 — **Sentiness baseline reinicializado:** `.sentiness/baseline.json` estava vazio; com decisão do Yan, rodado `sentiness baseline init` (25 falsos-positivos pré-existentes do knip suprimidos: deps Nuxt, `multer`, `@sentiness/check-*`, `eslint`). `newInDiff` limpo. Issue de dogfooding aberta: https://github.com/Arateki/Sentiness/issues/7 (knip flaga os próprios `@sentiness/check-*` e `eslint` como deps não usadas out of the box; + Nuxt/deps dinâmicas).
 
 ## Decisões pendentes
 
