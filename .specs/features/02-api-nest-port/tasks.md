@@ -243,6 +243,7 @@ T6 + T7 + T8 + T12 + T13 + T14 + T15 -> T16
 
 ### T8 — Cities endpoint [P]
 
+**Status:** [x] concluida em 2026-06-14.  
 **What:** Port `GET/POST/PATCH/DELETE /cities` with `countryParentCode` and `stateParentCode` support and protected mutations.  
 **Where:** `apps/api/src/geo/cities.*.ts`, `apps/api/test/cities.e2e-spec.ts`  
 **Depends on:** T3, T5  

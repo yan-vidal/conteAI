@@ -1,9 +1,13 @@
 import { Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 import { AuthModule } from "../auth/auth.module.js";
+import { CitiesController } from "./cities.controller.js";
+import { CitiesService } from "./cities.service.js";
 import { CountriesController } from "./countries.controller.js";
 import { CountriesService } from "./countries.service.js";
 import {
+  CityModelName,
+  CitySchema,
   CountryModelName,
   CountrySchema,
   StateModelName,
@@ -17,10 +21,11 @@ import { StatesService } from "./states.service.js";
     MongooseModule.forFeature([
       { name: CountryModelName, schema: CountrySchema },
       { name: StateModelName, schema: StateSchema },
+      { name: CityModelName, schema: CitySchema },
     ]),
     AuthModule,
   ],
-  controllers: [CountriesController, StatesController],
-  providers: [CountriesService, StatesService],
+  controllers: [CountriesController, StatesController, CitiesController],
+  providers: [CountriesService, StatesService, CitiesService],
 })
 export class GeoModule {}
