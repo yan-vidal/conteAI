@@ -104,7 +104,7 @@ Status: [ ] pendente · [x] concluida. Gates: `pnpm --filter api test` (API), `p
 **Depende de:** P2, P3.
 **Done when:** SSR retorna HTML com imagens; filtros e deep-links funcionam; default favoritas com toggle.
 **Commit:** `feat(web): gallery view with favorites default`
-- [ ]
+- [x] concluida em 2026-06-14. `/gallery` usa `useAsyncData` para filtros e primeira página de imagens, renderiza `<img>`/alt reais, aplica `sort=metadata.takenAt&order=desc`, default `favorite=true`, toggle `?all=true`, filtros de URL legados, empty-state com CTA para todas e retry de deep-link 404 em modo "Todas". Verificado com `pnpm --filter web test` (14 testes), `pnpm --filter web lint`, `pnpm --filter web typecheck`, `pnpm --filter web build` sob Node 26 e Sentiness fast `ok`.
 
 ## P6 — Web: ModalViewerImage (R3)
 **O que:** carrossel de versões, toggle original, painel EXIF, paleta com copy-hex, links Maps/Street View, teclado + gestos touch (workarounds iOS documentados), cache de imagens; usa `resize()` da P4. Deep-link `version=`.

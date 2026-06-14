@@ -1,11 +1,22 @@
 {
   "$vuetify": {
     "input": {
-      "appendAction": "ação adicional"
+      "appendAction": "ação adicional",
+      "clear": "limpar"
     }
   },
   "gallery": {
+    "all": "Todas",
+    "city": "Cidade",
+    "country": "País",
+    "emptyFavoritesText": "As fotos favoritas aparecem aqui primeiro. Você ainda pode ver o acervo completo.",
+    "emptyFavoritesTitle": "Nenhuma favorita publicada",
     "eyebrow": "Galeria pública",
+    "favorites": "Favoritas ★",
+    "loadMore": "Carregar mais",
+    "showAllEmpty": "Ver todas as fotos",
+    "state": "Estado",
+    "tags": "Tags",
     "title": "ConteAI Gallery"
   },
   "header": {

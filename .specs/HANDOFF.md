@@ -15,6 +15,7 @@
 - **F3 P3 — Rotas + auth middleware**: `/`→`/gallery`, `/gallery` público preservando query de deep-link, `/secretdoor`, `/upload` e `/list`; `auth` middleware exige token Pinia para `/upload`/`/list`; HeaderBar com toggle de tema. 7 testes web verdes, lint/typecheck web verdes sob Node 26, Sentiness fast `ok`.
 - **F3 P4 — Matemática do modal**: `apps/web/utils/modalResize.ts` porta `resize()` do legado e `apps/web/test/modalResize.spec.ts` prova paridade exata contra a fixture golden. 8 testes web verdes, lint/typecheck web verdes sob Node 26, Sentiness fast `ok`.
 - **F3 P7 — Login**: `/secretdoor` com formulário i18n, `auth.login()`/`POST /authentication`, token/payload no Pinia, redirect para `/list` em sucesso e erro visível em credenciais inválidas. 10 testes web verdes, lint/typecheck web verdes sob Node 26, Sentiness fast `ok`.
+- **F3 P5 — GalleryView + favoritas**: `/gallery` com `useAsyncData` para filtros e primeira página, `<img>`/alt reais, ordenação `metadata.takenAt desc`, default favoritas (`favorite=true`), toggle `?all=true`, filtros de URL legados, empty-state com CTA e retry de deep-link 404 em "Todas". 14 testes web verdes, lint/typecheck/build web verdes sob Node 26, Sentiness fast `ok`.
 
 ## Decisões de execução da F3 (adotadas das sugestões da spec)
 
@@ -23,10 +24,10 @@
 
 ## Next Step
 
-**Retomar a F3 na tarefa P5** (ver `tasks.md`). Ordem sugerida: P5 → P6 → P8 → P9 → P10.
+**Retomar a F3 na tarefa P6** (ver `tasks.md`). Ordem sugerida: P6 → P8 → P9 → P10.
 
-- **P5** GalleryView (filtros cascata, infinite scroll, sync URL, SSR 1ª página via `useAsyncData`, default favoritas + toggle `?all=true` + empty-state, deep-link R11). **Ordenação default `metadata.takenAt desc` é invariante.**
-- **P6** ModalViewerImage (usa P4) · **P8** Upload · **P9** List/Edit · **P10** regressão visual vs goldens + Vitest + aceitação.
+- **P6** ModalViewerImage (usa P4) com deep-link `version=` e detalhes EXIF/paleta/links.
+- **P8** Upload · **P9** List/Edit · **P10** regressão visual vs goldens + Vitest + aceitação.
 
 Ler primeiro: `.specs/features/03-web-nuxt-favoritas/spec.md` e a seção P1–P10 de `tasks.md`. Front legado de referência em `yan-site-front-vue/src/` (GalleryView, ModalViewerImage, ModalEditImage, UploadImages, LoginView; store Vuex; `plugins/api.js`).
 

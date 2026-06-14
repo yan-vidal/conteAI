@@ -1,11 +1,22 @@
 {
   "$vuetify": {
     "input": {
-      "appendAction": "append action"
+      "appendAction": "append action",
+      "clear": "clear"
     }
   },
   "gallery": {
+    "all": "All",
+    "city": "City",
+    "country": "Country",
+    "emptyFavoritesText": "Favorite photos appear here first. The full archive is still available.",
+    "emptyFavoritesTitle": "No favorites published",
     "eyebrow": "Public gallery",
+    "favorites": "Favorites ★",
+    "loadMore": "Load more",
+    "showAllEmpty": "View all photos",
+    "state": "State",
+    "tags": "Tags",
     "title": "ConteAI Gallery"
   },
   "header": {
