@@ -130,6 +130,9 @@ export class ImageEntity {
 
   @Prop({ required: true, type: ImageMetadataSchema })
   metadata!: ImageMetadataEntity;
+
+  @Prop({ default: false })
+  favorite?: boolean;
 }
 
 export type ImageEntityDocument = HydratedDocument<ImageEntity>;

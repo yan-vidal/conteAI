@@ -62,3 +62,81 @@ Filtros candidatos:
 - `/gallery?country=Japan&state=Tokyo&city=Taito&tag=Temple`
 - `/gallery?country=Brazil&state=Bahia&city=Lençóis&tag=Landscape`
 - `/gallery?id=67b7eb60084f9f0679bb2b17&version=1`
+
+---
+
+# Porte completo (execução) — breakdown 2026-06-14
+
+Status: [ ] pendente · [x] concluida. Gates: `pnpm --filter api test` (API), `pnpm --filter web test` (web), `pnpm lint && pnpm typecheck && pnpm build`, Sentiness fast pós-edit / standard pré-done. Visual contra goldens da Fase 0 (RV5) entra na T14.
+
+**Decisões de execução (das sugestões da spec):** upload com checkbox "Favorita" **marcado** por padrão (R10); toggle da galeria via `?all=true` na URL (R9, ausência = só favoritas).
+
+## P1 — API: campo favorite (R7, R8)
+**O que:** adicionar `favorite: boolean (default false)` ao schema `Image` e ao tipo `ImageDocument` em `@conteai/shared`; `GET /images?favorite=true|false` (true → `{favorite:true}`, false → `{favorite:false}`, ausente → sem filtro); aceitar `favorite` em `POST /images` (body) e `PATCH /images/:id`. e2e cobrindo filtro + create/edit.
+**Depende de:** F2 (concluída).
+**Done when:** testes da API verdes; contrato existente preservado (ausência de favorite = não-favorito).
+**Commit:** `feat(api): add image favorite field and filter`
+- [x] concluida em 2026-06-14. `favorite?: boolean` (schema default false) em `Image` + `ImageDocument`; `GET /images?favorite=` filtra; upload/edit aceitam `favorite`. e2e: filtro, default no upload, toggle no patch. 79 testes verdes.
+
+## P2 — Web: fundação (API client + Pinia + config) (R5)
+**O que:** composable/`$fetch` tipado com `@conteai/shared` e `NUXT_PUBLIC_API_URL`; stores Pinia (auth/token com persistência localStorage; tema claro/escuro; filtros da galeria; toggle favoritas; tutorial-visto placeholder); plugin de tema. Vuetify 3 + i18n já no skeleton.
+**Depende de:** P1 (tipos shared).
+**Done when:** `useApi` lista `/images` e `/countries` em dev; token persiste; typecheck/test web verdes.
+**Commit:** `feat(web): api client and pinia stores`
+- [ ]
+
+## P3 — Web: rotas + middleware de auth (R1)
+**O que:** `/` → redirect `/gallery`; `/gallery` (SSR público); `/secretdoor` (login); `/upload` e `/list` (client-only, middleware exige token Pinia). Layout base + HeaderBar portado.
+**Depende de:** P2.
+**Done when:** rotas resolvem; `/upload` e `/list` redirecionam sem token; deep-link query preservada.
+**Commit:** `feat(web): routes and auth middleware`
+- [ ]
+
+## P4 — Web: porte da matemática `resize()` do modal (RV4)
+**O que:** portar a função pura de `tests/legacy-resize/legacyResize.ts` para `apps/web` e provar contra a fixture de characterization (valores idênticos ao legado).
+**Depende de:** P2.
+**Done when:** suite de unidade reproduz a fixture golden exatamente.
+**Commit:** `feat(web): port modal resize math`
+- [ ]
+
+## P5 — Web: GalleryView + favoritas (R2, R6, R9, R11)
+**O que:** grid com filtros em cascata country/state/city, tags, range de datas, infinite scroll, sync de estado↔URL, tema, i18n; ordenação default `metadata.takenAt desc`; SSR da 1ª página via `useAsyncData` com `<img>`/alt reais; default só favoritas + toggle "Favoritas ★ / Todas" (`?all=true`), empty-state com CTA; deep-link por `id` de foto não-favorita força "Todas" (R11).
+**Depende de:** P2, P3.
+**Done when:** SSR retorna HTML com imagens; filtros e deep-links funcionam; default favoritas com toggle.
+**Commit:** `feat(web): gallery view with favorites default`
+- [ ]
+
+## P6 — Web: ModalViewerImage (R3)
+**O que:** carrossel de versões, toggle original, painel EXIF, paleta com copy-hex, links Maps/Street View, teclado + gestos touch (workarounds iOS documentados), cache de imagens; usa `resize()` da P4. Deep-link `version=`.
+**Depende de:** P4, P5.
+**Done when:** modal abre por deep-link com versão correta; EXIF/paleta/links corretos.
+**Commit:** `feat(web): modal image viewer`
+- [ ]
+
+## P7 — Web: Login (/secretdoor) (R1)
+**O que:** form de login → `POST /authentication`, grava token no Pinia, redireciona; i18n.
+**Depende de:** P2, P3.
+**Done when:** login válido autentica e libera `/upload` e `/list`; inválido mostra erro.
+**Commit:** `feat(web): login view`
+- [ ]
+
+## P8 — Web: Upload (client-only) (R4, R10)
+**O que:** multi-arquivo com versionNames, checkbox Original, checkbox Favorita (default marcado), descrição → `POST /images` multipart; feedback/erros.
+**Depende de:** P2, P3, P7, P1.
+**Done when:** upload multi-versão cria imagem (validado contra a API).
+**Commit:** `feat(web): upload view`
+- [ ]
+
+## P9 — Web: List/Edit (client-only) (R4, R10)
+**O que:** listagem admin, edição completa (incl. metadata/URLs), delete com confirmação, toggle favorita na linha e no modal.
+**Depende de:** P2, P3, P7, P1.
+**Done when:** editar/excluir/alternar favorita refletem na API.
+**Commit:** `feat(web): list and edit view`
+- [ ]
+
+## P10 — Regressão visual + testes + aceitação (RV5, RV6, critérios 1-5)
+**O que:** rodar comparação Playwright do front novo contra os goldens da Fase 0 (thresholds calibrados, masks nos elementos novos), revisar diffs visualmente; Vitest dos componentes críticos (galeria, viewer, toggle favoritas); registrar no Sentiness slow (RV6); doc de aceitação + handoff.
+**Depende de:** P5, P6, P7, P8, P9.
+**Done when:** paridade visual aceita conscientemente; critérios 1-5 da spec atendidos; handoff para F4.
+**Commit:** `docs: record web port acceptance`
+- [ ]

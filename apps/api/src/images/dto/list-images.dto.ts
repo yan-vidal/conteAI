@@ -1,5 +1,12 @@
 import { Transform, Type } from "class-transformer";
-import { IsIn, IsInt, IsOptional, IsString, Min } from "class-validator";
+import {
+  IsBoolean,
+  IsIn,
+  IsInt,
+  IsOptional,
+  IsString,
+  Min,
+} from "class-validator";
 
 const toStringArray = ({ value }: { value: unknown }): string[] | undefined => {
   if (value === undefined || value === null) {
@@ -11,6 +18,16 @@ const toStringArray = ({ value }: { value: unknown }): string[] | undefined => {
   }
 
   return [String(value)];
+};
+
+const toBoolean = ({ value }: { value: unknown }): unknown => {
+  if (value === "true" || value === true) {
+    return true;
+  }
+  if (value === "false" || value === false) {
+    return false;
+  }
+  return value;
 };
 
 export class ListImagesDto {
@@ -108,4 +125,9 @@ export class ListImagesDto {
   @IsOptional()
   @IsString()
   id?: string;
+
+  @IsOptional()
+  @Transform(toBoolean)
+  @IsBoolean()
+  favorite?: boolean;
 }

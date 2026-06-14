@@ -205,6 +205,7 @@ export class ImagesService {
         ...(body.description !== undefined && {
           description: body.description,
         }),
+        ...(body.favorite !== undefined && { favorite: body.favorite }),
         ...(location.country !== undefined && { country: location.country }),
         ...(location.state !== undefined && { state: location.state }),
         ...(location.city !== undefined && { city: location.city }),
@@ -267,6 +268,9 @@ export class ImagesService {
     }
     if (body.city !== undefined) {
       image.city = body.city;
+    }
+    if (body.favorite !== undefined) {
+      image.favorite = body.favorite;
     }
     if (body.images !== undefined) {
       image.set(
@@ -367,6 +371,10 @@ export class ImagesService {
     }
     if (query.aperture) {
       filter["metadata.aperture"] = { $in: query.aperture };
+    }
+
+    if (query.favorite !== undefined) {
+      filter.favorite = query.favorite;
     }
 
     const takenAt = this.buildDateRange(query.takenAtFrom, query.takenAtTo);

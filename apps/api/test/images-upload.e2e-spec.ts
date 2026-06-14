@@ -126,6 +126,7 @@ describe("POST /images", () => {
       .field("versionNames", "Original")
       .field("versionNames", "Edited")
       .field("description", "A pinned shot")
+      .field("favorite", "true")
       .attach("files", jpeg, {
         contentType: "image/jpeg",
         filename: "original.jpg",
@@ -137,6 +138,7 @@ describe("POST /images", () => {
       .expect(201);
 
     expect(response.body.tags).toEqual(["Landscape"]);
+    expect(response.body.favorite).toBe(true);
     expect(response.body.description).toBe("A pinned shot");
     expect(response.body.images).toHaveLength(1);
     expect(response.body.original.versionName).toBe("Original");
@@ -174,6 +176,7 @@ describe("POST /images", () => {
     expect(response.body.images).toEqual([]);
     expect(response.body.original.versionName).toBe("Original");
     expect(response.body.tags).toEqual([]);
+    expect(response.body.favorite).toBe(false);
   });
 
   it("rejects non-image uploads", async () => {
