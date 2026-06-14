@@ -111,7 +111,7 @@ Status: [ ] pendente · [x] concluida. Gates: `pnpm --filter api test` (API), `p
 **Depende de:** P4, P5.
 **Done when:** modal abre por deep-link com versão correta; EXIF/paleta/links corretos.
 **Commit:** `feat(web): modal image viewer`
-- [ ]
+- [x] concluida em 2026-06-14. `ModalViewerImage.vue` renderiza versão solicitada por `version=`, alterna original/versões, usa `calculateModalSize`, mostra EXIF/tags/paleta com copy-hex, links Maps/Street View, teclado e swipe; `/gallery?id=&version=` abre o modal correto. Verificado com `pnpm --filter web test` (16 testes), `pnpm --filter web lint`, `pnpm --filter web typecheck`, `pnpm --filter web build` sob Node 26 e Sentiness fast `ok`.
 
 ## P7 — Web: Login (/secretdoor) (R1)
 **O que:** form de login → `POST /authentication`, grava token no Pinia, redireciona; i18n.

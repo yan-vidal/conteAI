@@ -129,11 +129,17 @@
         :key="image._id"
         class="image-tile"
       >
-        <img
-          :alt="imageAlt(image)"
-          loading="lazy"
-          :src="thumbnailUrl(image)"
+        <button
+          class="image-button"
+          type="button"
+          @click="openImage(image)"
         >
+          <img
+            :alt="imageAlt(image)"
+            loading="lazy"
+            :src="thumbnailUrl(image)"
+          >
+        </button>
         <figcaption>{{ imageAlt(image) }}</figcaption>
       </figure>
     </section>
@@ -165,6 +171,17 @@
         {{ $t("gallery.loadMore") }}
       </v-btn>
     </div>
+
+    <ModalViewerImage
+      v-if="selectedImage"
+      :image="selectedImage"
+      :is-rotated="isRotated"
+      :version="versionOpen || undefined"
+      @close="closeImage"
+      @next="changeImage(1)"
+      @prev="changeImage(-1)"
+      @version="setVersion"
+    />
   </v-container>
 </template>
 
@@ -179,6 +196,7 @@ import type {
 import { computed, ref, watch } from "vue";
 import type { LocationQueryValue } from "vue-router";
 import { useAsyncData, useRoute, useRouter } from "#imports";
+import ModalViewerImage from "../components/ModalViewerImage.vue";
 import { type GalleryQuery, useApi } from "../composables/useApi.js";
 
 interface FilterData {
@@ -232,6 +250,8 @@ const versionOpen = ref(toQueryText(route.query.version));
 const showAll = ref(toQueryText(route.query.all) === "true");
 const loadingMore = ref(false);
 const errorMessage = ref("");
+const selectedImage = ref<ImageDocument | null>(null);
+const isRotated = ref(false);
 
 const { data: filterData } = await useAsyncData<FilterData>(
   "gallery-filters",
@@ -349,6 +369,11 @@ const total = ref(initialImages.data.value?.total ?? 0);
 const pending = computed(() => initialImages.pending.value);
 const hasMore = computed(() => items.value.length < total.value);
 
+if (idOpen.value) {
+  selectedImage.value =
+    items.value.find((image) => image._id === idOpen.value) ?? null;
+}
+
 const thumbnailUrl = (image: ImageDocument): string =>
   image.images[0]?.thumbnailUrl ?? image.original.thumbnailUrl;
 
@@ -405,6 +430,45 @@ const replaceRouteQuery = async (): Promise<void> => {
   await router.replace({ path: "/gallery", query: buildRouteQuery() });
 };
 
+const openImage = async (image: ImageDocument): Promise<void> => {
+  selectedImage.value = image;
+  idOpen.value = image._id ?? "";
+  versionOpen.value = image.images.length > 0 ? "1" : "original";
+  await replaceRouteQuery();
+};
+
+const closeImage = async (): Promise<void> => {
+  selectedImage.value = null;
+  idOpen.value = "";
+  versionOpen.value = "";
+  await replaceRouteQuery();
+};
+
+const setVersion = async (version: string): Promise<void> => {
+  versionOpen.value = version;
+  await replaceRouteQuery();
+};
+
+const changeImage = async (direction: 1 | -1): Promise<void> => {
+  if (!selectedImage.value) {
+    return;
+  }
+
+  const currentIndex = items.value.findIndex(
+    (image) => image._id === selectedImage.value?._id,
+  );
+  const nextImage = items.value[currentIndex + direction];
+
+  if (!nextImage) {
+    return;
+  }
+
+  selectedImage.value = nextImage;
+  idOpen.value = nextImage._id ?? "";
+  versionOpen.value = nextImage.images.length > 0 ? "1" : "original";
+  await replaceRouteQuery();
+};
+
 const refreshImages = async (): Promise<void> => {
   errorMessage.value = "";
 
@@ -412,6 +476,9 @@ const refreshImages = async (): Promise<void> => {
     const response = await fetchImages(0, showAll.value);
     items.value = response.images;
     total.value = response.total;
+    selectedImage.value = idOpen.value
+      ? items.value.find((image) => image._id === idOpen.value) ?? null
+      : null;
   } catch {
     errorMessage.value = "Image not found";
     items.value = [];
@@ -517,7 +584,19 @@ h1 {
   margin: 0;
 }
 
-.image-tile img {
+.image-button {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  display: block;
+  font: inherit;
+  padding: 0;
+  text-align: left;
+  width: 100%;
+}
+
+.image-button img {
   aspect-ratio: 1;
   border-radius: 8px;
   display: block;
