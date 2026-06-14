@@ -294,6 +294,7 @@ T6 + T7 + T8 + T12 + T13 + T14 + T15 -> T16
 
 ### T10 — Google Vision and Geocoding module [P]
 
+**Status:** [x] concluida em 2026-06-14.  
 **What:** Port Google Vision label/color extraction and Google Maps reverse geocoding as injectable services with mocked HTTP tests and no response dumps in logs.  
 **Where:** `apps/api/src/google/`  
 **Depends on:** T1, T2  
@@ -313,6 +314,8 @@ T6 + T7 + T8 + T12 + T13 + T14 + T15 -> T16
 **Tests:** unit  
 **Gate:** API quick + Sentiness post-edit  
 **Commit:** `feat(api): port google metadata services`
+
+**Implementation notes:** `VisionService` e `GeocodingService` no `GoogleModule`, com `HttpClient` injetavel (token `HTTP_CLIENT`, interface estreita sobre axios). Vision pede `LABEL_DETECTION` so na primeira imagem e `IMAGE_PROPERTIES` em todas; `imageUri = BUCKET_URL + "/" + key` (otimizada); cores mapeadas para `{red,green,blue,score,pixelFraction}` com defaults 0. Geocoding replica a precedencia legada (locality|admin_2 -> city, admin_1 -> state, country) e retorna `{}` (em vez de lancar) quando nao ha resultados. Nenhum payload externo logado. `GoogleModule` sera importado pelo `ImagesModule` na T15.
 
 ---
 
