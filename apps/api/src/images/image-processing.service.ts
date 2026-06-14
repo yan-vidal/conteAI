@@ -2,8 +2,6 @@ import type { ImageMetadata } from "@conteai/shared";
 import { Injectable } from "@nestjs/common";
 import sharp from "sharp";
 
-export const FULL_SIZE_CONTENT_TYPE = "application/octet-stream";
-
 export interface ImageDerivatives {
   lazyThumbnailBase64: string;
   thumbnailBuffer: Buffer;

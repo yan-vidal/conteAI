@@ -432,6 +432,7 @@ T6 + T7 + T8 + T12 + T13 + T14 + T15 -> T16
 
 ### T15 — Image upload pipeline
 
+**Status:** [x] concluida em 2026-06-14.  
 **What:** Port protected `POST /images` multipart upload with EXIF, derivatives, S3, Vision, Geocoding, tag allowlist, original/versions split, rollback, and legacy response shape.  
 **Where:** `apps/api/src/images/images.controller.ts`, `apps/api/src/images/images.service.ts`, `apps/api/src/images/dto/upload-image.dto.ts`, `apps/api/test/images-upload.e2e-spec.ts`  
 **Depends on:** T3, T4, T5, T9, T10, T11, T13  
@@ -454,6 +455,8 @@ T6 + T7 + T8 + T12 + T13 + T14 + T15 -> T16
 **Tests:** e2e + unit coverage from dependencies  
 **Gate:** API full + Sentiness post-edit  
 **Commit:** `feat(api): port image upload pipeline`
+
+**Implementation notes:** `POST /images` (protegido) usa `FilesInterceptor("files")` (memory storage) + `UploadImageDto` (versionNames por indice, description). `validateFiles` aplica mimetype `image/*`, max count e max size do `ConfigService` (novos envs `MAX_UPLOAD_FILES`/`MAX_UPLOAD_FILE_SIZE` com defaults 20 / 25MB). EXIF lido do arquivo `Original` (T11); derivativos via `ImageProcessingService`; upload de thumbnail/optimized (mimetype) e full-size (octet-stream) ao S3 com `uploadedKeys` para rollback. Vision anexa colorPalette por versao e filtra labels contra a collection `Tag`; geocoding so com lat/long. Split original/edited por `versionName`. Em qualquer falha pos-upload, `deleteImages(uploadedKeys)` e rethrow. Resposta com URLs absolutas; keys relativas no banco. `FULL_SIZE_CONTENT_TYPE` movido para `image-processing.constants.ts` (o Biome convertia o import de DI para `type` num import multi-especificador). `vitest` testTimeout/hookTimeout = 30s para os e2e que sobem app + mongo-memory sob carga. Testes usam sharp real, `aws-sdk-client-mock` e override do `HTTP_CLIENT`.
 
 ---
 

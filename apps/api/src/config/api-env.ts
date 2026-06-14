@@ -10,7 +10,12 @@ export interface ApiEnv {
   BUCKET_URL: string;
   GOOGLE_API_KEY: string;
   CORS_ORIGIN?: string;
+  MAX_UPLOAD_FILES: number;
+  MAX_UPLOAD_FILE_SIZE: number;
 }
+
+const DEFAULT_MAX_UPLOAD_FILES = 20;
+const DEFAULT_MAX_UPLOAD_FILE_SIZE = 25 * 1024 * 1024;
 
 type EnvInput = Record<string, unknown>;
 
@@ -49,6 +54,26 @@ const getPort = (env: EnvInput): number => {
   }
 
   return port;
+};
+
+const getPositiveInt = (
+  env: EnvInput,
+  key: string,
+  fallback: number,
+): number => {
+  const raw = getString(env, key);
+
+  if (!raw) {
+    return fallback;
+  }
+
+  const parsed = Number(raw);
+
+  if (!Number.isInteger(parsed) || parsed <= 0) {
+    throw new Error(`${key} must be a positive integer`);
+  }
+
+  return parsed;
 };
 
 const getMongoUri = (env: EnvInput): string => {
@@ -93,5 +118,15 @@ export const validateApiEnv = (env: EnvInput): ApiEnv => {
     BUCKET_URL: requireString(env, "BUCKET_URL"),
     GOOGLE_API_KEY: getGoogleApiKey(env),
     ...(corsOrigin ? { CORS_ORIGIN: corsOrigin } : {}),
+    MAX_UPLOAD_FILES: getPositiveInt(
+      env,
+      "MAX_UPLOAD_FILES",
+      DEFAULT_MAX_UPLOAD_FILES,
+    ),
+    MAX_UPLOAD_FILE_SIZE: getPositiveInt(
+      env,
+      "MAX_UPLOAD_FILE_SIZE",
+      DEFAULT_MAX_UPLOAD_FILE_SIZE,
+    ),
   };
 };

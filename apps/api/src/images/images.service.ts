@@ -1,13 +1,36 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
+// biome-ignore lint/style/useImportType: Nest uses constructor metadata for DI at runtime.
+import { ConfigService } from "@nestjs/config";
 import { InjectModel } from "@nestjs/mongoose";
 import type { Model, QueryFilter } from "mongoose";
+import type { ApiEnv } from "../config/api-env.js";
+// biome-ignore lint/style/useImportType: Nest uses constructor metadata for DI at runtime.
+import { GeocodingService } from "../google/geocoding.service.js";
+// biome-ignore lint/style/useImportType: Nest uses constructor metadata for DI at runtime.
+import { VisionService } from "../google/vision.service.js";
 // biome-ignore lint/style/useImportType: Nest uses constructor metadata for DI at runtime.
 import { StorageService } from "../storage/storage.service.js";
+import { type TagEntity, TagModelName } from "../tags/tag.schema.js";
 import type { EditableVersion, EditImageDto } from "./dto/edit-image.dto.js";
 import type { ListImagesDto } from "./dto/list-images.dto.js";
-import { type ImageEntity, ImageModelName } from "./image.schema.js";
+import type { UploadImageDto } from "./dto/upload-image.dto.js";
+import {
+  type ImageEntity,
+  ImageModelName,
+  type ImageVersionEntity,
+} from "./image.schema.js";
+import { FULL_SIZE_CONTENT_TYPE } from "./image-processing.constants.js";
+// biome-ignore lint/style/useImportType: Nest uses constructor metadata for DI at runtime.
+import { ImageProcessingService } from "./image-processing.service.js";
 // biome-ignore lint/style/useImportType: Nest uses constructor metadata for DI at runtime.
 import { ImageUrlService, stripToKey } from "./image-url.service.js";
+// biome-ignore lint/style/useImportType: Nest uses constructor metadata for DI at runtime.
+import { MetadataService } from "./metadata/metadata.service.js";
+import type { UploadFile } from "./upload-file.js";
 
 interface DateRange {
   $gte?: Date;
@@ -21,10 +44,28 @@ export class ImagesService {
   @InjectModel(ImageModelName)
   private readonly imageModel!: Model<ImageEntity>;
 
+  @InjectModel(TagModelName)
+  private readonly tagModel!: Model<TagEntity>;
+
+  private readonly maxUploadFiles: number;
+  private readonly maxUploadFileSize: number;
+
   constructor(
     private readonly imageUrlService: ImageUrlService,
     private readonly storageService: StorageService,
-  ) {}
+    private readonly metadataService: MetadataService,
+    private readonly imageProcessingService: ImageProcessingService,
+    private readonly visionService: VisionService,
+    private readonly geocodingService: GeocodingService,
+    configService: ConfigService<ApiEnv, true>,
+  ) {
+    this.maxUploadFiles = configService.get("MAX_UPLOAD_FILES", {
+      infer: true,
+    });
+    this.maxUploadFileSize = configService.get("MAX_UPLOAD_FILE_SIZE", {
+      infer: true,
+    });
+  }
 
   async list(query: ListImagesDto) {
     const filter = this.buildFilter(query);
@@ -62,6 +103,147 @@ export class ImagesService {
       images: this.imageUrlService.withPublicImageUrls(documents),
       total,
     };
+  }
+
+  async upload(files: UploadFile[], body: UploadImageDto) {
+    this.validateFiles(files);
+
+    const exifSource = this.metadataService.selectExifSource(
+      files,
+      body.versionNames,
+    );
+    const metadata = await this.metadataService.extractMetadata(exifSource);
+
+    const uploadedKeys: string[] = [];
+
+    try {
+      const versions: ImageVersionEntity[] = [];
+
+      for (const [index, file] of files.entries()) {
+        const derivatives = await this.imageProcessingService.createDerivatives(
+          file.buffer,
+          metadata,
+        );
+        const keys = this.imageProcessingService.buildObjectKeys(
+          file.originalname,
+        );
+
+        await this.storageService.uploadImage(
+          keys.thumbnailKey,
+          derivatives.thumbnailBuffer,
+          file.mimetype,
+        );
+        uploadedKeys.push(keys.thumbnailKey);
+
+        await this.storageService.uploadImage(
+          keys.optimizedKey,
+          derivatives.optimizedBuffer,
+          file.mimetype,
+        );
+        uploadedKeys.push(keys.optimizedKey);
+
+        await this.storageService.uploadImage(
+          keys.fullSizeKey,
+          derivatives.fullSizeBuffer,
+          FULL_SIZE_CONTENT_TYPE,
+        );
+        uploadedKeys.push(keys.fullSizeKey);
+
+        const versionName = body.versionNames[index];
+        versions.push({
+          colorPalette: [],
+          fullSizeUrl: keys.fullSizeKey,
+          lazyThumbnailBase64: derivatives.lazyThumbnailBase64,
+          optimizedUrl: keys.optimizedKey,
+          thumbnailUrl: keys.thumbnailKey,
+          ...(versionName !== undefined && { versionName }),
+        });
+      }
+
+      const vision = await this.visionService.getTagsAndColors(
+        versions.map((version) => version.optimizedUrl),
+      );
+      versions.forEach((version, index) => {
+        version.colorPalette = vision.colors[index] ?? [];
+      });
+
+      const original = versions.find(
+        (version) => version.versionName?.toLowerCase() === "original",
+      );
+
+      if (!original) {
+        throw new BadRequestException(
+          "Upload requires a version named Original",
+        );
+      }
+
+      const editedVersions = versions.filter(
+        (version) => version.versionName?.toLowerCase() !== "original",
+      );
+
+      const location =
+        metadata.latitude !== undefined && metadata.longitude !== undefined
+          ? await this.geocodingService.getCityStateCountry(
+              metadata.latitude,
+              metadata.longitude,
+            )
+          : {};
+
+      const existingTags = await this.tagModel
+        .find()
+        .select("name")
+        .lean()
+        .exec();
+      const tagNames = new Set(existingTags.map((tag) => tag.name));
+      const tags = vision.tags.filter((tag) => tagNames.has(tag));
+
+      const document = {
+        images: editedVersions,
+        metadata,
+        original,
+        tags,
+        ...(body.description !== undefined && {
+          description: body.description,
+        }),
+        ...(location.country !== undefined && { country: location.country }),
+        ...(location.state !== undefined && { state: location.state }),
+        ...(location.city !== undefined && { city: location.city }),
+      };
+
+      const created = await this.imageModel.create(document);
+      const [withUrls] = this.imageUrlService.withPublicImageUrls([
+        created.toObject(),
+      ]);
+
+      if (!withUrls) {
+        throw new Error("Failed to map image urls");
+      }
+
+      return withUrls;
+    } catch (error) {
+      if (uploadedKeys.length > 0) {
+        await this.storageService.deleteImages(uploadedKeys);
+      }
+
+      throw error;
+    }
+  }
+
+  private validateFiles(files: UploadFile[]): void {
+    if (files.length === 0) {
+      throw new BadRequestException("At least one file is required");
+    }
+    if (files.length > this.maxUploadFiles) {
+      throw new BadRequestException("Too many files in a single upload");
+    }
+    for (const file of files) {
+      if (!file.mimetype.startsWith("image/")) {
+        throw new BadRequestException("Only image uploads are allowed");
+      }
+      if (file.buffer.length > this.maxUploadFileSize) {
+        throw new BadRequestException("File exceeds the maximum allowed size");
+      }
+    }
   }
 
   async edit(id: string, body: EditImageDto) {

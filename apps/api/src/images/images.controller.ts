@@ -7,16 +7,23 @@ import {
   HttpCode,
   Param,
   Patch,
+  Post,
   Query,
+  UploadedFiles,
   UseGuards,
+  UseInterceptors,
 } from "@nestjs/common";
+import { FilesInterceptor } from "@nestjs/platform-express";
 import { JwtAuthGuard } from "../auth/jwt-auth.guard.js";
 // biome-ignore lint/style/useImportType: ValidationPipe needs the runtime DTO class for metadata.
 import { EditImageDto } from "./dto/edit-image.dto.js";
 // biome-ignore lint/style/useImportType: ValidationPipe needs the runtime DTO class for metadata.
 import { ListImagesDto } from "./dto/list-images.dto.js";
+// biome-ignore lint/style/useImportType: ValidationPipe needs the runtime DTO class for metadata.
+import { UploadImageDto } from "./dto/upload-image.dto.js";
 // biome-ignore lint/style/useImportType: Nest uses constructor metadata for DI at runtime.
 import { ImagesService } from "./images.service.js";
+import type { UploadFile } from "./upload-file.js";
 
 @Controller("images")
 export class ImagesController {
@@ -26,6 +33,14 @@ export class ImagesController {
   @Bind(Query())
   list(query: ListImagesDto) {
     return this.imagesService.list(query);
+  }
+
+  @Post()
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FilesInterceptor("files"))
+  @Bind(UploadedFiles(), Body())
+  upload(files: UploadFile[], body: UploadImageDto) {
+    return this.imagesService.upload(files, body);
   }
 
   @Patch(":id")

@@ -4,9 +4,13 @@ import sharp from "sharp";
 import type { UploadFile } from "../upload-file.js";
 import { loadExifMetadata } from "./exif-metadata.js";
 
+export type ExtractedImageMetadata = Omit<ImageMetadata, "takenAt"> & {
+  takenAt?: Date;
+};
+
 @Injectable()
 export class MetadataService {
-  async extractMetadata(buffer: Buffer): Promise<ImageMetadata> {
+  async extractMetadata(buffer: Buffer): Promise<ExtractedImageMetadata> {
     const extracted = loadExifMetadata(buffer);
 
     let fullSizeWidth = extracted.fullSizeWidth;
