@@ -97,7 +97,7 @@ Status: [ ] pendente · [x] concluida. Gates: `pnpm --filter api test` (API), `p
 **Depende de:** P2.
 **Done when:** suite de unidade reproduz a fixture golden exatamente.
 **Commit:** `feat(web): port modal resize math`
-- [ ]
+- [x] concluida em 2026-06-14. `apps/web/utils/modalResize.ts` porta a matemática do legado sem arredondar valores; `apps/web/test/modalResize.spec.ts` compara contra a fixture golden de `tests/legacy-resize`. Verificado com `pnpm --filter web test` (8 testes), `pnpm --filter web lint`, `pnpm --filter web typecheck` sob Node 26 e Sentiness fast `ok`.
 
 ## P5 — Web: GalleryView + favoritas (R2, R6, R9, R11)
 **O que:** grid com filtros em cascata country/state/city, tags, range de datas, infinite scroll, sync de estado↔URL, tema, i18n; ordenação default `metadata.takenAt desc`; SSR da 1ª página via `useAsyncData` com `<img>`/alt reais; default só favoritas + toggle "Favoritas ★ / Todas" (`?all=true`), empty-state com CTA; deep-link por `id` de foto não-favorita força "Todas" (R11).
