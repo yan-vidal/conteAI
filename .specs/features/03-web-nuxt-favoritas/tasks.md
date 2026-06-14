@@ -125,7 +125,7 @@ Status: [ ] pendente · [x] concluida. Gates: `pnpm --filter api test` (API), `p
 **Depende de:** P2, P3, P7, P1.
 **Done when:** upload multi-versão cria imagem (validado contra a API).
 **Commit:** `feat(web): upload view`
-- [ ]
+- [x] concluida em 2026-06-14. `/upload` tem formulário client-only protegido, múltiplos arquivos com `versionNames[index]`, Original exclusivo, Favorita marcada por padrão, descrição e envio via `useApi().uploadImage(FormData)` com feedback de sucesso/erro. Verificado com `pnpm --filter web test` (18 testes), `pnpm --filter web lint`, `pnpm --filter web typecheck`, `pnpm --filter web build` sob Node 26 e Sentiness fast `ok`.
 
 ## P9 — Web: List/Edit (client-only) (R4, R10)
 **O que:** listagem admin, edição completa (incl. metadata/URLs), delete com confirmação, toggle favorita na linha e no modal.

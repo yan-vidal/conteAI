@@ -37,6 +37,16 @@
     "submit": "Entrar"
   },
   "upload": {
-    "eyebrow": "Administração"
+    "addVersion": "Adicionar versão",
+    "description": "Descrição",
+    "eyebrow": "Administração",
+    "favorite": "Favorita",
+    "file": "Arquivo",
+    "image": "Imagem",
+    "original": "Original",
+    "sending": "Enviando...",
+    "submit": "Enviar",
+    "title": "Upload de Imagens",
+    "versionName": "Nome da versão"
   }
 }

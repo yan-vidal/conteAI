@@ -37,6 +37,16 @@
     "submit": "Sign in"
   },
   "upload": {
-    "eyebrow": "Administration"
+    "addVersion": "Add version",
+    "description": "Description",
+    "eyebrow": "Administration",
+    "favorite": "Favorite",
+    "file": "File",
+    "image": "Image",
+    "original": "Original",
+    "sending": "Sending...",
+    "submit": "Send",
+    "title": "Image Upload",
+    "versionName": "Version name"
   }
 }
