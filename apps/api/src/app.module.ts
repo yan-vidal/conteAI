@@ -7,6 +7,7 @@ import { validateApiEnv } from "./config/api-env.js";
 import { DatabaseModule } from "./database/database.module.js";
 import { GeoModule } from "./geo/geo.module.js";
 import { HealthModule } from "./health/health.module.js";
+import { ImagesModule } from "./images/images.module.js";
 import { TagsModule } from "./tags/tags.module.js";
 
 @Module({
@@ -25,6 +26,7 @@ import { TagsModule } from "./tags/tags.module.js";
     AuthModule,
     GeoModule,
     HealthModule,
+    ImagesModule,
     TagsModule,
   ],
   providers: [

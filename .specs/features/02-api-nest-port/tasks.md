@@ -376,6 +376,7 @@ T6 + T7 + T8 + T12 + T13 + T14 + T15 -> T16
 
 ### T13 — Public image listing and deep-link contract
 
+**Status:** [x] concluida em 2026-06-14.  
 **What:** Port `GET /images` with filters, metadata allowlist, sorting, pagination, URL prefixing, and deep-link-by-id limit expansion.  
 **Where:** `apps/api/src/images/images.controller.ts`, `apps/api/src/images/images.service.ts`, `apps/api/src/images/dto/list-images.dto.ts`, `apps/api/test/images-list.e2e-spec.ts`  
 **Depends on:** T3, T4  
@@ -396,6 +397,8 @@ T6 + T7 + T8 + T12 + T13 + T14 + T15 -> T16
 **Tests:** e2e  
 **Gate:** API full + Sentiness post-edit  
 **Commit:** `feat(api): port image listing`
+
+**Implementation notes:** `ListImagesDto` valida e fixa o allowlist (tags/country/state/city + metadata camera/lens/iso/shutterSpeed/flash/whiteBalance/aperture, datas, sort/order, offset/limit, id); `whitelist + forbidNonWhitelisted` rejeita chaves desconhecidas (400) e o `@Transform` coage valores a `string[]`, neutralizando injecao de operador Mongo. Filtro tipado como `QueryFilter<ImageEntity & { createdAt?: Date }>` (mongoose 9 usa `QueryFilter`, nao `FilterQuery`); `tags` usa `$all`, demais `$in`. Default offset 0 / limit 10; sort so quando `sort && order` (default de ordenacao fica no front, como no legado). Deep-link por `id` carrega os `_id` ordenados, acha o indice e expande o limit a partir de offset 0; id fora do conjunto retorna 404. `ImageUrlService` (helpers genericos, `.lean()`) prefixa `BUCKET_URL` na saida. Resposta `{ images, total }`.
 
 ---
 

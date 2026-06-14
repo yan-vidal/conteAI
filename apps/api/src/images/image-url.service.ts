@@ -1,7 +1,18 @@
-import type { ImageDocument, ImageVersion } from "@conteai/shared";
 import { Injectable } from "@nestjs/common";
-import type { ConfigService } from "@nestjs/config";
+// biome-ignore lint/style/useImportType: Nest uses constructor metadata for DI at runtime.
+import { ConfigService } from "@nestjs/config";
 import type { ApiEnv } from "../config/api-env.js";
+
+interface VersionUrls {
+  fullSizeUrl: string;
+  optimizedUrl: string;
+  thumbnailUrl: string;
+}
+
+interface UrlMappableImage {
+  images: VersionUrls[];
+  original: VersionUrls;
+}
 
 const isHttpUrl = (value: string): boolean =>
   value.startsWith("http://") || value.startsWith("https://");
@@ -26,20 +37,20 @@ const stripToKey = (value: string): string => {
   return lastSlashIndex >= 0 ? value.substring(lastSlashIndex + 1) : value;
 };
 
-const mapVersionUrls = (
-  version: ImageVersion,
+const mapVersionUrls = <V extends VersionUrls>(
+  version: V,
   mapUrl: (url: string) => string,
-): ImageVersion => ({
+): V => ({
   ...version,
   fullSizeUrl: mapUrl(version.fullSizeUrl),
   optimizedUrl: mapUrl(version.optimizedUrl),
   thumbnailUrl: mapUrl(version.thumbnailUrl),
 });
 
-export const withPublicImageUrls = (
-  documents: ImageDocument[],
+export const withPublicImageUrls = <T extends UrlMappableImage>(
+  documents: T[],
   bucketUrl: string,
-): ImageDocument[] =>
+): T[] =>
   documents.map((document) => ({
     ...document,
     images: document.images.map((image) =>
@@ -50,9 +61,9 @@ export const withPublicImageUrls = (
     ),
   }));
 
-export const stripPublicImageUrls = (
-  document: ImageDocument,
-): ImageDocument => ({
+export const stripPublicImageUrls = <T extends UrlMappableImage>(
+  document: T,
+): T => ({
   ...document,
   images: document.images.map((image) => mapVersionUrls(image, stripToKey)),
   original: mapVersionUrls(document.original, stripToKey),
@@ -62,12 +73,12 @@ export const stripPublicImageUrls = (
 export class ImageUrlService {
   constructor(private readonly configService: ConfigService<ApiEnv, true>) {}
 
-  withPublicImageUrls(documents: ImageDocument[]): ImageDocument[] {
+  withPublicImageUrls<T extends UrlMappableImage>(documents: T[]): T[] {
     const bucketUrl = this.configService.get("BUCKET_URL", { infer: true });
     return withPublicImageUrls(documents, bucketUrl);
   }
 
-  stripPublicImageUrls(document: ImageDocument): ImageDocument {
+  stripPublicImageUrls<T extends UrlMappableImage>(document: T): T {
     return stripPublicImageUrls(document);
   }
 }
