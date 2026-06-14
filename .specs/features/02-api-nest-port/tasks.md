@@ -404,6 +404,7 @@ T6 + T7 + T8 + T12 + T13 + T14 + T15 -> T16
 
 ### T14 — Image edit and delete
 
+**Status:** [x] concluida em 2026-06-14.  
 **What:** Port protected `PATCH /images/:id` and `DELETE /images/:id`, preserving edit response shape and S3 cleanup while fixing metadata-absent PATCH and missing-id semantics.  
 **Where:** `apps/api/src/images/images.controller.ts`, `apps/api/src/images/images.service.ts`, `apps/api/src/images/dto/edit-image.dto.ts`, `apps/api/test/images-edit-delete.e2e-spec.ts`  
 **Depends on:** T3, T4, T5, T9  
@@ -424,6 +425,8 @@ T6 + T7 + T8 + T12 + T13 + T14 + T15 -> T16
 **Tests:** e2e  
 **Gate:** API full + Sentiness post-edit  
 **Commit:** `feat(api): port image edit delete`
+
+**Implementation notes:** `EditImageDto` valida escalares e trata `images`/`original`/`metadata` como passthrough (sem `@Type`, Mongoose casta no save) + tolera os campos round-trip do front legado (`_id`/`__v`/`createdAt`/`updatedAt`) para nao colidir com `forbidNonWhitelisted`. PATCH aplica campos parciais (corrige o crash legado quando `metadata` ausente — so atualiza `metadata.takenAt`), faz strip das URLs absolutas para keys relativas via `stripToKey` (exportado do T4) e devolve URLs absolutas. PATCH/DELETE de id inexistente -> 404 (excecao aprovada na F2). DELETE remove todas as keys (images + original) do S3 via `StorageService` e entao apaga o doc (204). `ImagesModule` agora importa `StorageModule` (resolve o pendente da T9). Mutacoes sem token -> 401. Testes usam `aws-sdk-client-mock` para o delete.
 
 ---
 

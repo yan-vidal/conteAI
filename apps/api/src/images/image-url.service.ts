@@ -28,7 +28,7 @@ const joinPublicUrl = (bucketUrl: string, key: string): string => {
   return `${normalizedBucketUrl}/${normalizedKey}`;
 };
 
-const stripToKey = (value: string): string => {
+export const stripToKey = (value: string): string => {
   if (!isHttpUrl(value)) {
     return value;
   }
