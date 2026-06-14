@@ -268,6 +268,7 @@ T6 + T7 + T8 + T12 + T13 + T14 + T15 -> T16
 
 ### T9 — Storage module [P]
 
+**Status:** [x] concluida em 2026-06-14.  
 **What:** Port S3 upload/delete as injectable storage service with test-time mockability and no module-level mutable client state.  
 **Where:** `apps/api/src/storage/`, `apps/api/src/config/`  
 **Depends on:** T1, T2  
@@ -286,6 +287,8 @@ T6 + T7 + T8 + T12 + T13 + T14 + T15 -> T16
 **Tests:** unit  
 **Gate:** API quick + Sentiness post-edit  
 **Commit:** `feat(api): add storage service`
+
+**Implementation notes:** `S3Client` injetado via token `S3_CLIENT` (factory no `StorageModule` a partir do `ConfigService`, sem cliente mutavel a nivel de modulo); `BUCKET_API` opcional vira `endpoint` so quando presente. `uploadImage` retorna a key relativa (nunca URL); `deleteImages([])` e no-op. Testes usam `aws-sdk-client-mock`. `StorageModule` ainda nao e importado pelo `AppModule` — sera consumido pelo `ImagesModule` (T14/T15) antes da checagem standard/knip da T16.
 
 ---
 
