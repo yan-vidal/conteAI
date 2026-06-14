@@ -339,6 +339,7 @@ T6 + T7 + T8 + T12 + T13 + T14 + T15 -> T16
 
 ### T12 — Tags endpoint and sync [P]
 
+**Status:** [x] concluida em 2026-06-14.  
 **What:** Port `GET/POST/PATCH/DELETE /tags` and `POST /tags/sync`, including image tag cleanup.  
 **Where:** `apps/api/src/tags/`, `apps/api/test/tags.e2e-spec.ts`  
 **Depends on:** T3, T5  
@@ -359,6 +360,8 @@ T6 + T7 + T8 + T12 + T13 + T14 + T15 -> T16
 **Tests:** e2e  
 **Gate:** API full + Sentiness post-edit  
 **Commit:** `feat(api): port tags endpoints`
+
+**Implementation notes:** `TagsModule` registra os models `Tag` e `Image` (sync precisa varrer imagens) e importa `AuthModule`. `sync()` carrega os nomes de tags num `Set` e usa `updateOne` por imagem removendo tags ausentes; `POST /tags/sync` (protegido) retorna 201 com body vazio (equivalente ao `send(null)` legado). `@Post("sync")` e `@Post()` nao conflitam (paths distintos).
 
 ---
 
