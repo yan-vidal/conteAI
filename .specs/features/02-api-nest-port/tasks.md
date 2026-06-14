@@ -164,6 +164,7 @@ T6 + T7 + T8 + T12 + T13 + T14 + T15 -> T16
 
 ### T5 — Auth module, JWT guard, and throttled login
 
+**Status:** [x] concluida em 2026-06-13.  
 **What:** Port `POST /authentication` and protected-route auth to Nest, fixing JWT expiration while preserving response shape `{ token, payload }`.  
 **Where:** `apps/api/src/auth/`, `apps/api/src/app.module.ts`  
 **Depends on:** T3  
@@ -183,6 +184,8 @@ T6 + T7 + T8 + T12 + T13 + T14 + T15 -> T16
 **Tests:** e2e + unit  
 **Gate:** API full + Sentiness post-edit  
 **Commit:** `feat(api): port authentication`
+
+**Implementation notes:** `AuthService` usa `JwtService.signAsync` com `expiresIn: "1h"` (corrige o bug do `exp * 100000` do legado) e mantem a paridade externa lancando erro 500 em credencial invalida; `JwtAuthGuard` valida o header `Bearer` e responde 401 em rotas protegidas; `@Throttle({ limit: 5, ttl: 60_000 })` no login e `ThrottlerGuard` global via `APP_GUARD`; e2e cobre login valido/invalido e o guard spec cobre acesso protegido com/sem token.
 
 ---
 
