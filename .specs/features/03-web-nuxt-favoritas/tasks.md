@@ -132,7 +132,7 @@ Status: [ ] pendente · [x] concluida. Gates: `pnpm --filter api test` (API), `p
 **Depende de:** P2, P3, P7, P1.
 **Done when:** editar/excluir/alternar favorita refletem na API.
 **Commit:** `feat(web): list and edit view`
-- [ ]
+- [x] concluida em 2026-06-14. `/list` protegido lista imagens admin ordenadas por `createdAt desc`, alterna favorita na linha, edita campos básicos + tags + `metadata.takenAt` + URLs de original/versões, exclui com confirmação e mantém feedback de erro/sucesso. Verificado com `pnpm --filter web test` (20 testes), `pnpm --filter web lint`, `pnpm --filter web typecheck`, `pnpm --filter web build` sob Node 26 e Sentiness fast `ok`.
 
 ## P10 — Regressão visual + testes + aceitação (RV5, RV6, critérios 1-5)
 **O que:** rodar comparação Playwright do front novo contra os goldens da Fase 0 (thresholds calibrados, masks nos elementos novos), revisar diffs visualmente; Vitest dos componentes críticos (galeria, viewer, toggle favoritas); registrar no Sentiness slow (RV6); doc de aceitação + handoff.

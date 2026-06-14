@@ -18,6 +18,7 @@
 - **F3 P5 — GalleryView + favoritas**: `/gallery` com `useAsyncData` para filtros e primeira página, `<img>`/alt reais, ordenação `metadata.takenAt desc`, default favoritas (`favorite=true`), toggle `?all=true`, filtros de URL legados, empty-state com CTA e retry de deep-link 404 em "Todas". 14 testes web verdes, lint/typecheck/build web verdes sob Node 26, Sentiness fast `ok`.
 - **F3 P6 — ModalViewerImage**: modal abre por `/gallery?id=&version=`, renderiza versão correta, alterna original/versões, usa `calculateModalSize`, mostra EXIF/tags/paleta copy-hex, links Maps/Street View e navegação por teclado/swipe. 16 testes web verdes, lint/typecheck/build web verdes sob Node 26, Sentiness fast `ok`.
 - **F3 P8 — Upload**: `/upload` client-only protegido com multi-arquivo, `versionNames[index]`, Original exclusivo, Favorita marcada por padrão, descrição, `useApi().uploadImage(FormData)` e feedback de sucesso/erro. 18 testes web verdes, lint/typecheck/build web verdes sob Node 26, Sentiness fast `ok`.
+- **F3 P9 — List/Edit**: `/list` client-only protegido lista imagens admin, alterna favorita na linha, edita descrição/local/tags/favorita + `metadata.takenAt` + URLs de original/versões e exclui com confirmação. 20 testes web verdes, lint/typecheck/build web verdes sob Node 26, Sentiness fast `ok`.
 
 ## Decisões de execução da F3 (adotadas das sugestões da spec)
 
@@ -26,9 +27,9 @@
 
 ## Next Step
 
-**Retomar a F3 na tarefa P9** (ver `tasks.md`). Ordem sugerida: P9 → P10.
+**Retomar a F3 na tarefa P10** (ver `tasks.md`): regressão visual contra os goldens da Fase 0, revisão dos diffs, Sentiness slow/aceitação e handoff para F4.
 
-- **P9** List/Edit · **P10** regressão visual vs goldens + Vitest + aceitação.
+- **P10** regressão visual vs goldens + Vitest + aceitação.
 
 Ler primeiro: `.specs/features/03-web-nuxt-favoritas/spec.md` e a seção P1–P10 de `tasks.md`. Front legado de referência em `yan-site-front-vue/src/` (GalleryView, ModalViewerImage, ModalEditImage, UploadImages, LoginView; store Vuex; `plugins/api.js`).
 

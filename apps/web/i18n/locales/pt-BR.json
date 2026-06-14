@@ -28,7 +28,31 @@
     "subtitle": "Base Nuxt renderizada no servidor para portar a galeria sem quebrar os links públicos existentes."
   },
   "list": {
-    "eyebrow": "Administração"
+    "cancel": "Cancelar",
+    "city": "Cidade",
+    "close": "Fechar",
+    "confirmDelete": "Excluir imagem",
+    "country": "País",
+    "delete": "Excluir",
+    "deleteQuestion": "Esta ação remove a imagem do acervo.",
+    "description": "Descrição",
+    "edit": "Editar",
+    "editTitle": "Editar imagem",
+    "eyebrow": "Administração",
+    "favorite": "Favorita",
+    "fullSizeUrl": "URL full-size",
+    "loadMore": "Carregar mais",
+    "metadata": "Metadados",
+    "optimizedUrl": "URL otimizada",
+    "original": "Original",
+    "save": "Salvar",
+    "state": "Estado",
+    "tags": "Tags",
+    "takenAt": "Capturada em",
+    "thumbnailUrl": "URL thumbnail",
+    "title": "Lista de Imagens",
+    "versionName": "Versão",
+    "versions": "Versões"
   },
   "login": {
     "eyebrow": "Acesso restrito",

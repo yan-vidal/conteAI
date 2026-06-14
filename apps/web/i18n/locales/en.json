@@ -28,7 +28,31 @@
     "subtitle": "Server-rendered Nuxt foundation for porting the gallery without breaking existing public links."
   },
   "list": {
-    "eyebrow": "Administration"
+    "cancel": "Cancel",
+    "city": "City",
+    "close": "Close",
+    "confirmDelete": "Delete image",
+    "country": "Country",
+    "delete": "Delete",
+    "deleteQuestion": "This action removes the image from the archive.",
+    "description": "Description",
+    "edit": "Edit",
+    "editTitle": "Edit image",
+    "eyebrow": "Administration",
+    "favorite": "Favorite",
+    "fullSizeUrl": "Full-size URL",
+    "loadMore": "Load more",
+    "metadata": "Metadata",
+    "optimizedUrl": "Optimized URL",
+    "original": "Original",
+    "save": "Save",
+    "state": "State",
+    "tags": "Tags",
+    "takenAt": "Taken at",
+    "thumbnailUrl": "Thumbnail URL",
+    "title": "Image List",
+    "versionName": "Version",
+    "versions": "Versions"
   },
   "login": {
     "eyebrow": "Restricted access",
