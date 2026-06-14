@@ -321,6 +321,7 @@ T6 + T7 + T8 + T12 + T13 + T14 + T15 -> T16
 
 ### T11 — Metadata and image derivative service [P]
 
+**Status:** [x] concluida em 2026-06-14.  
 **What:** Port EXIF profile extraction and derivative generation, including the F2 correction to read EXIF from the file named `Original` when present.  
 **Where:** `apps/api/src/images/metadata/`, `apps/api/src/images/image-processing.service.ts`  
 **Depends on:** T1, T2  
@@ -340,6 +341,8 @@ T6 + T7 + T8 + T12 + T13 + T14 + T15 -> T16
 **Tests:** unit  
 **Gate:** API quick + Sentiness post-edit  
 **Commit:** `feat(api): port image metadata processing`
+
+**Implementation notes:** `exif-metadata.ts` extrai os perfis (iPhone/Poco/DJI/Hero9/Sony/Lumia/"--"/generico); `flash` e `whiteBalance` sao sempre "Off"/"Auto" (os enums legados so tinham essas entradas, com default igual) — fixados preservando o output exato. `MetadataService.extractMetadata` cai em `sharp().metadata()` quando o EXIF nao traz dimensoes e lanca se ainda faltarem; `selectExifSource` escolhe o arquivo `Original` (case-insensitive) ou o primeiro (correcao F2). `loadExifMetadata` trata o throw do ExifReader em imagens sem metadata caindo no perfil generico. `takenAt` reproduz o parse legado em hora local. `ImageProcessingService` gera lazy webp base64, thumbnail, optimized e full-size (octet-stream) e as keys `${Date.now()}-${sanitizado}[...]`.
 
 ---
 
