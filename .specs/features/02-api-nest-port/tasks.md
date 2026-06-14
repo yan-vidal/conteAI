@@ -2,7 +2,7 @@
 
 **Spec:** `.specs/features/02-api-nest-port/spec.md`  
 **Design source:** spec F2 + `.specs/codebase/{ARCHITECTURE,STRUCTURE,CONCERNS,CONVENTIONS,INTEGRATIONS,TESTING}.md`. Não há `design.md` dedicado para F2; esta quebra fixa a arquitetura de execução no nível de tarefas.  
-**Status:** Draft  
+**Status:** Complete (T1–T16 concluídas em 2026-06-14)  
 **Scope:** Complex  
 
 Status: [ ] pendente · [x] concluida. `[P]` = paralelizavel depois das dependencias indicadas.
@@ -462,6 +462,7 @@ T6 + T7 + T8 + T12 + T13 + T14 + T15 -> T16
 
 ### T16 — F2 acceptance, legacy front smoke, and handoff
 
+**Status:** [x] concluida em 2026-06-14 (smoke do front legado documentado e adiado para infra real — ver acceptance.md).  
 **What:** Run full gates, execute the documented legacy-front acceptance checklist against the Nest API, and refresh project state/handoff for F3 continuation.  
 **Where:** `.specs/features/02-api-nest-port/acceptance.md`, `.specs/project/STATE.md`, `.specs/HANDOFF.md`, optional README env notes if implementation adds required setup details  
 **Depends on:** T6, T7, T8, T12, T13, T14, T15  
@@ -482,6 +483,8 @@ T6 + T7 + T8 + T12 + T13 + T14 + T15 -> T16
 **Tests:** full repo + manual acceptance  
 **Gate:** Repo standard + Sentiness pre-done  
 **Commit:** `docs: record api port acceptance`
+
+**Implementation notes:** gates repo-wide passam (lint, typecheck, 77 testes, build) sob Node 26; Sentiness standard `ok` apos reinicializar o baseline (decisao do Yan — ver acceptance.md, nota de dogfooding). Removidas deps nao usadas `nock` e `@types/multer`. Smoke do front legado contra a API Nest fica como checklist manual (exige Mongo/S3/Google reais) em `acceptance.md`, a validar antes do cutover (F7). Nenhum codigo morto migrado.
 
 ## Parallel Execution Map
 
