@@ -5,6 +5,7 @@ import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 import { AuthModule } from "./auth/auth.module.js";
 import { validateApiEnv } from "./config/api-env.js";
 import { DatabaseModule } from "./database/database.module.js";
+import { GeoModule } from "./geo/geo.module.js";
 import { HealthModule } from "./health/health.module.js";
 
 @Module({
@@ -21,6 +22,7 @@ import { HealthModule } from "./health/health.module.js";
     ]),
     DatabaseModule,
     AuthModule,
+    GeoModule,
     HealthModule,
   ],
   providers: [

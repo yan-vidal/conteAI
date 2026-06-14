@@ -191,6 +191,7 @@ T6 + T7 + T8 + T12 + T13 + T14 + T15 -> T16
 
 ### T6 — Countries endpoint [P]
 
+**Status:** [x] concluida em 2026-06-13.  
 **What:** Port `GET/POST/PATCH/DELETE /countries` with public list and protected mutations.  
 **Where:** `apps/api/src/geo/countries.*.ts`, `apps/api/test/countries.e2e-spec.ts`  
 **Depends on:** T3, T5  
@@ -210,6 +211,8 @@ T6 + T7 + T8 + T12 + T13 + T14 + T15 -> T16
 **Tests:** e2e  
 **Gate:** API full + Sentiness post-edit  
 **Commit:** `feat(api): port countries endpoints`
+
+**Implementation notes:** `GeoModule` registra o model `Country` e importa `AuthModule` para o `JwtAuthGuard`; controller usa `@Bind(...)` (o Biome do projeto nao parseia parameter decorators) e o DTO e value-import com `biome-ignore` para preservar o metatype do `ValidationPipe`. Not-found em PATCH/DELETE retorna 404 (caminho que o front legado nunca exercita; legado dava 500). Mutacoes sem token retornam 401 via guard (legado dava 403 — mudanca aprovada na F2). `findByIdAndUpdate` usa `returnDocument: "after"`.
 
 ---
 
