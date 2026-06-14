@@ -1,0 +1,503 @@
+{
+  "schemaVersion": "1.0",
+  "createdAt": "2026-06-14T05:22:33.159Z",
+  "createdAtCommit": "4b2bb4afddfe222f85a4d6128f9f96fd426b5d88",
+  "suppressed": [
+    {
+      "checkId": "knip",
+      "ruleId": "unlisted-dependencies",
+      "fingerprint": "0241a55e45c39146758076d4fd9d87b1b8e7ad6fd8a9453f38546494698abecf",
+      "location": {
+        "file": "apps/web/nuxt.config.ts"
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    },
+    {
+      "checkId": "knip",
+      "ruleId": "unused-dev-dependencies",
+      "fingerprint": "0775aa8a530955d01ee8262bf9f00a6a99abb913bdbd2c11cb3d6d9db28cc69b",
+      "location": {
+        "file": "package.json",
+        "startLine": 24
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    },
+    {
+      "checkId": "deps-diff",
+      "ruleId": "removed-transitive-dependency",
+      "fingerprint": "196c63307e6f42897e0f73bc93acd68f719cdb1dba46851da2a0ce4ab5b8668f",
+      "location": {
+        "file": "pnpm-lock.yaml"
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    },
+    {
+      "checkId": "deps-diff",
+      "ruleId": "removed-transitive-dependency",
+      "fingerprint": "19d8f64b6af2f1bf6b87dc3f20e378dc931c754dc82287eacec6d3f880a0a280",
+      "location": {
+        "file": "pnpm-lock.yaml"
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    },
+    {
+      "checkId": "knip",
+      "ruleId": "unused-exports",
+      "fingerprint": "1ded994f83647cfa44e40f636ef5d93484ed36337a48d5e14c026810d7bb914a",
+      "location": {
+        "file": "tests/visual/legacy.helpers.ts",
+        "startLine": 42
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    },
+    {
+      "checkId": "knip",
+      "ruleId": "unused-exports",
+      "fingerprint": "25539073a1f9f9fbd79f5f4b23ea7a79192ce6e1557c761910fec6ce011f0afb",
+      "location": {
+        "file": "tests/visual/legacy.helpers.ts",
+        "startLine": 33
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    },
+    {
+      "checkId": "deps-diff",
+      "ruleId": "removed-transitive-dependency",
+      "fingerprint": "33b0c167a4b35835fa3b925cfde65f82ba4bb7d2f82626ec41df5e1fd3ef37e2",
+      "location": {
+        "file": "pnpm-lock.yaml"
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    },
+    {
+      "checkId": "deps-diff",
+      "ruleId": "removed-transitive-dependency",
+      "fingerprint": "341db3d871f4811cc631715b8864a87b4e8324fb61a01a5cb4bbea684a9e8c24",
+      "location": {
+        "file": "pnpm-lock.yaml"
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    },
+    {
+      "checkId": "knip",
+      "ruleId": "unused-dependencies",
+      "fingerprint": "34713ed52251e2426161cc8cc3a565e4f559297773f806b8fe13bbb75b6821dd",
+      "location": {
+        "file": "apps/api/package.json",
+        "startLine": 29
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    },
+    {
+      "checkId": "deps-diff",
+      "ruleId": "removed-transitive-dependency",
+      "fingerprint": "3b47555f05c8dcb0e1dc4fec7c8a1577d7326c700dfeb37277566f7725777e2a",
+      "location": {
+        "file": "pnpm-lock.yaml"
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    },
+    {
+      "checkId": "knip",
+      "ruleId": "unused-dev-dependencies",
+      "fingerprint": "3f4866d536e3b385979281114ff31bbdd9458d7acdf6927689a7aff5d36cff32",
+      "location": {
+        "file": "package.json",
+        "startLine": 29
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    },
+    {
+      "checkId": "deps-diff",
+      "ruleId": "removed-transitive-dependency",
+      "fingerprint": "439ff2919af4cdc6ce831132de96bba55ae7d285f44d92ac73f8d87a7c3de7d9",
+      "location": {
+        "file": "pnpm-lock.yaml"
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    },
+    {
+      "checkId": "deps-diff",
+      "ruleId": "removed-transitive-dependency",
+      "fingerprint": "4e71be456bf40455fac838765cb38bf370fbb734b1c37c5b22a799234d10dfbd",
+      "location": {
+        "file": "pnpm-lock.yaml"
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    },
+    {
+      "checkId": "knip",
+      "ruleId": "unused-types",
+      "fingerprint": "5caa29c381a184e63c2af6d2cfec9b9adeeaebcf2830e2025fe92b0fda64238c",
+      "location": {
+        "file": "apps/api/src/images/image.schema.ts",
+        "startLine": 135
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    },
+    {
+      "checkId": "deps-diff",
+      "ruleId": "removed-transitive-dependency",
+      "fingerprint": "65cf0a5bf73ac4cc0c2175745df723e7ecd6f430ce0d5a5fa700c772afa9ffce",
+      "location": {
+        "file": "pnpm-lock.yaml"
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    },
+    {
+      "checkId": "deps-diff",
+      "ruleId": "removed-transitive-dependency",
+      "fingerprint": "66ad6f2585df3346214310b85f8b271f8c39ac04aecd450ebaa5e88faa94a6c4",
+      "location": {
+        "file": "pnpm-lock.yaml"
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    },
+    {
+      "checkId": "deps-diff",
+      "ruleId": "removed-transitive-dependency",
+      "fingerprint": "6b9123e5fd7cd57b3f33c4c76c8d44570dfd5d4cee1974452ce0f644a6245c7e",
+      "location": {
+        "file": "pnpm-lock.yaml"
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    },
+    {
+      "checkId": "knip",
+      "ruleId": "unused-dependencies",
+      "fingerprint": "6c98dc350703d3f01f6e84d5a9773f48fc1e0a582363be98eb39ab3e423c4233",
+      "location": {
+        "file": "apps/web/package.json",
+        "startLine": 14
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    },
+    {
+      "checkId": "knip",
+      "ruleId": "unused-dev-dependencies",
+      "fingerprint": "6d4e1a335423c4ae96948ccdb6defb4c1fe30f6be613bc1e9f09ec1825ef136e",
+      "location": {
+        "file": "package.json",
+        "startLine": 27
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    },
+    {
+      "checkId": "knip",
+      "ruleId": "unused-types",
+      "fingerprint": "702dc6d19347ca8da7d714e4aad28e808b9582776f5bb476a7c23125b9851469",
+      "location": {
+        "file": "apps/api/src/auth/user.schema.ts",
+        "startLine": 15
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    },
+    {
+      "checkId": "knip",
+      "ruleId": "unused-exports",
+      "fingerprint": "73cf7873c759de7d8d10f28001d77c81d4e7aac067707dc306d41ba6da753e0d",
+      "location": {
+        "file": "apps/api/src/images/image.schema.ts",
+        "startLine": 48
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    },
+    {
+      "checkId": "deps-diff",
+      "ruleId": "removed-transitive-dependency",
+      "fingerprint": "769957159b63d21babb48d0241cf514689cf4ec3ae04d1180e76e2d4b9aedd8f",
+      "location": {
+        "file": "pnpm-lock.yaml"
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    },
+    {
+      "checkId": "deps-diff",
+      "ruleId": "removed-transitive-dependency",
+      "fingerprint": "7c65901a8f76685125f3b4ecd90ca135fad4651ffc3b2b874baa40a8964f06a8",
+      "location": {
+        "file": "pnpm-lock.yaml"
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    },
+    {
+      "checkId": "knip",
+      "ruleId": "unused-types",
+      "fingerprint": "7cd472d04c0cb12a827df119cc6d6176ec5e884d0704a7cab9a5ac16cb88f2ac",
+      "location": {
+        "file": "tests/legacy-resize/legacyResize.ts",
+        "startLine": 9
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    },
+    {
+      "checkId": "knip",
+      "ruleId": "unused-exports",
+      "fingerprint": "7d6e8b202f55cf95a03bb9e40eeb0e063441a05ba7c637ed25f6e24a9cb7fef0",
+      "location": {
+        "file": "apps/api/test/fixtures/api-fixtures.ts",
+        "startLine": 88
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    },
+    {
+      "checkId": "knip",
+      "ruleId": "unused-exports",
+      "fingerprint": "805d35f6ac543861d68b77b2204816997a1d7067c2d5a2d1d69467decaf01ac8",
+      "location": {
+        "file": "apps/api/src/images/image.schema.ts",
+        "startLine": 105
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    },
+    {
+      "checkId": "knip",
+      "ruleId": "unused-dev-dependencies",
+      "fingerprint": "835bf09112b9a6683ab85661dfa564a895c0c85df8dd00f07cb4220a29b5e0f1",
+      "location": {
+        "file": "apps/web/package.json",
+        "startLine": 34
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    },
+    {
+      "checkId": "knip",
+      "ruleId": "unused-exports",
+      "fingerprint": "85f0df4f4da79cb53415cdcff9c8c72cbfb7281fb1ec65fd332f10f7db8fe5ef",
+      "location": {
+        "file": "apps/api/src/images/image.schema.ts",
+        "startLine": 24
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    },
+    {
+      "checkId": "knip",
+      "ruleId": "unused-dev-dependencies",
+      "fingerprint": "89cf6d50b9b257d6a70ad4071ee51e17a91fef08de72e961bbb4b351dd1bf324",
+      "location": {
+        "file": "package.json",
+        "startLine": 23
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    },
+    {
+      "checkId": "knip",
+      "ruleId": "unused-exports",
+      "fingerprint": "995df5991297e5761d337689658fe5d403d5dd5756760e3034fa646fe658dba0",
+      "location": {
+        "file": "apps/api/test/fixtures/api-fixtures.ts",
+        "startLine": 160
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    },
+    {
+      "checkId": "deps-diff",
+      "ruleId": "removed-transitive-dependency",
+      "fingerprint": "9ba15056393b47a0d1639a1a6c89268569c7f2396634f330f11f0310bae247f9",
+      "location": {
+        "file": "pnpm-lock.yaml"
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    },
+    {
+      "checkId": "knip",
+      "ruleId": "unused-dependencies",
+      "fingerprint": "9f5d0be5acaee8419c3dc392fbc15d5b548a080607851b159d2fe5c8343d0350",
+      "location": {
+        "file": "apps/web/package.json",
+        "startLine": 20
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    },
+    {
+      "checkId": "knip",
+      "ruleId": "unused-dev-dependencies",
+      "fingerprint": "9fe22345098d15109aa9e444f03f8ee6f29458f40e30ad46f3b24991975b7ce7",
+      "location": {
+        "file": "apps/web/package.json",
+        "startLine": 30
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    },
+    {
+      "checkId": "knip",
+      "ruleId": "unused-exports",
+      "fingerprint": "afea9cc887f4b3c5992e37fb3a0ac8add0cb79e866ccc45eddbfc5a74696df71",
+      "location": {
+        "file": "apps/api/test/fixtures/api-fixtures.ts",
+        "startLine": 154
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    },
+    {
+      "checkId": "deps-diff",
+      "ruleId": "removed-transitive-dependency",
+      "fingerprint": "b7d795efb7e8a1bd9b1a88d618e71910815b4666c0460c5c7f9593cbeb27a523",
+      "location": {
+        "file": "pnpm-lock.yaml"
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    },
+    {
+      "checkId": "knip",
+      "ruleId": "unused-exports",
+      "fingerprint": "bdebbb6a04b0ea6a66c677b2080fff4fdf30da8e46843c2ca389a1567aaccc23",
+      "location": {
+        "file": "apps/api/test/fixtures/api-fixtures.ts",
+        "startLine": 31
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    },
+    {
+      "checkId": "deps-diff",
+      "ruleId": "removed-transitive-dependency",
+      "fingerprint": "be882f99986ddf6da33dbc3005a62118603bca867f9f0c09d142ccbeae0fcdc4",
+      "location": {
+        "file": "pnpm-lock.yaml"
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    },
+    {
+      "checkId": "knip",
+      "ruleId": "unused-dev-dependencies",
+      "fingerprint": "c89c17be28f6c549b26b6bbfe2a5d2670db0ac45f5e5a12829f2a4c5bea061fa",
+      "location": {
+        "file": "package.json",
+        "startLine": 25
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    },
+    {
+      "checkId": "deps-diff",
+      "ruleId": "removed-transitive-dependency",
+      "fingerprint": "da08610937561a79d7ca0e246ea4cb8713104c7985ed35c8651cc162109a4074",
+      "location": {
+        "file": "pnpm-lock.yaml"
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    },
+    {
+      "checkId": "deps-diff",
+      "ruleId": "removed-transitive-dependency",
+      "fingerprint": "dea0f61fb14cf05066097575e7eba1262c1eb6d9a6804d510d859f66158d76cf",
+      "location": {
+        "file": "pnpm-lock.yaml"
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    },
+    {
+      "checkId": "knip",
+      "ruleId": "unused-exports",
+      "fingerprint": "e7ca3018ecebd8d857954c9da463dea229665a49987896258f624bb7f2a47cea",
+      "location": {
+        "file": "apps/api/test/fixtures/api-fixtures.ts",
+        "startLine": 108
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    },
+    {
+      "checkId": "deps-diff",
+      "ruleId": "removed-transitive-dependency",
+      "fingerprint": "f6446f0e1b40d69ef006890649d5755aa092967ee32a194e67e3573cb41106c2",
+      "location": {
+        "file": "pnpm-lock.yaml"
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    },
+    {
+      "checkId": "deps-diff",
+      "ruleId": "removed-transitive-dependency",
+      "fingerprint": "f842c0d0aace3d51271387b52d087fdc1218f726b29accab5557a1a52d7c8493",
+      "location": {
+        "file": "pnpm-lock.yaml"
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    },
+    {
+      "checkId": "deps-diff",
+      "ruleId": "removed-transitive-dependency",
+      "fingerprint": "fbd303b3255d304501f8daea09bbfbe7ae43ff4c5d35cfd1f6baf563691b0129",
+      "location": {
+        "file": "pnpm-lock.yaml"
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    },
+    {
+      "checkId": "knip",
+      "ruleId": "unused-dev-dependencies",
+      "fingerprint": "fc0a11927ba858b6ebdc80c97d96c32dbe87a8656946202a6d3ab83abf466623",
+      "location": {
+        "file": "package.json",
+        "startLine": 26
+      },
+      "addedAt": "2026-06-14T05:22:33.159Z",
+      "reason": "initial baseline"
+    }
+  ],
+  "metrics": {
+    "playwright.testsExpected": {
+      "value": 78,
+      "direction": "higher-is-better"
+    },
+    "playwright.testsUnexpected": {
+      "value": 0,
+      "direction": "higher-is-better"
+    },
+    "playwright.testsFlaky": {
+      "value": 0,
+      "direction": "higher-is-better"
+    },
+    "playwright.testsSkipped": {
+      "value": 0,
+      "direction": "higher-is-better"
+    },
+    "playwright.passRate": {
+      "value": 100,
+      "direction": "higher-is-better"
+    }
+  }
+}

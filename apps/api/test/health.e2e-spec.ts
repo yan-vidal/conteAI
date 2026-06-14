@@ -1,28 +1,24 @@
-import type { INestApplication } from "@nestjs/common";
-import { Test } from "@nestjs/testing";
 import request from "supertest";
 import { afterAll, beforeAll, describe, it } from "vitest";
-import { AppModule } from "../src/app.module.js";
+import { type ApiTestApp, createApiTestApp } from "./support/api-test-app.js";
 
 describe("GET /health", () => {
-  let app: INestApplication;
+  let testApp: ApiTestApp;
 
   beforeAll(async () => {
-    const moduleRef = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleRef.createNestApplication();
-    await app.listen(0, "127.0.0.1");
+    testApp = await createApiTestApp();
   });
 
   afterAll(async () => {
-    await app.close();
+    await testApp.close();
   });
 
   it("responds with ok status", async () => {
-    await request(app.getHttpServer()).get("/health").expect(200).expect({
-      status: "ok",
-    });
+    await request(testApp.app.getHttpServer())
+      .get("/health")
+      .expect(200)
+      .expect({
+        status: "ok",
+      });
   });
 });

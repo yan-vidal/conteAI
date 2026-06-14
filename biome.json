@@ -11,6 +11,7 @@
       "*.json",
       "*.jsonc",
       "apps/api/**",
+      "tests/**",
       "packages/shared/**",
       "!apps/web",
       "!yan-site-api-node",

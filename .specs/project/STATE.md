@@ -1,10 +1,12 @@
 # STATE — Memória do Projeto
 
-**Atualizado:** 2026-06-11
+**Atualizado:** 2026-06-14
 
 ## Sessão atual
 
-Mapeamento brownfield + decisões fechadas + specs F1–F7 + **passada de validação em effort MAX** (2026-06-11): 6 correções aplicadas, a mais importante o adapter da skill Sentiness (`claude-code-skill` em vez de `claude-code`, que corrompe CLAUDE.md). Handoff para o próximo agente em `.specs/HANDOFF.md`. **Execução autorizada começando pela F1.**
+**F1, F3 Fase 0 e F2 concluídas.** A F2 (porte completo da API NestJS) foi implementada e verificada nesta sessão: T1–T16, 77 testes, lint/typecheck/build OK, Sentiness standard `ok`. Aceitação em `.specs/features/02-api-nest-port/acceptance.md`. Próximo: **F3 — porte do frontend Nuxt** (comparar contra os goldens da Fase 0). Handoff atualizado em `.specs/HANDOFF.md`.
+
+Histórico: mapeamento brownfield + decisões fechadas + specs F1–F7 + passada de validação em effort MAX (2026-06-11): 6 correções aplicadas, a mais importante o adapter da skill Sentiness (`claude-code-skill`).
 
 ## Decisões tomadas
 
@@ -24,6 +26,9 @@ Mapeamento brownfield + decisões fechadas + specs F1–F7 + **passada de valida
 - 2026-06-11 — **Paridade visual dirigida por goldens (proposta do Yan, aprovada):** Fase 0 da F3, executada logo após F1 e antes da F2 — Playwright captura goldens do front legado (deep-links pinados, read-only contra API de produção, 6 viewports × ~8 estados, mesmo container Docker) + characterization tests da função `resize()` do modal (prova os branches que screenshots só amostram). Porte F3 compara contra os goldens com thresholds tolerantes (Vuetify beta→estável diverge por construção) e masks nos elementos novos. Spec: F3 §Fase 0 (RV1–RV6).
 - 2026-06-11 — **Lint híbrido:** Biome substitui ESLint+Prettier em `apps/api`/`packages/shared` (e alimenta o `check-biome` do Sentiness); ESLint+eslint-plugin-vue só em `apps/web` (suporte do Biome a .vue ainda experimental, sem regras específicas de Vue). Primeira issue publicada: `@sentiness/check-eslint` → https://github.com/Arateki/Sentiness/issues/1 (texto em `.specs/issues/sentiness-check-eslint.md`).
 
+- 2026-06-14 — **F2 concluída:** porte da API NestJS com paridade de contrato + correções aprovadas (ver `acceptance.md`). Geo/tags/imagens não-existentes retornam 404; `GET /images` com allowlist anti-injeção; upload usa EXIF do `Original`.
+- 2026-06-14 — **Sentiness baseline reinicializado:** `.sentiness/baseline.json` estava vazio; com decisão do Yan, rodado `sentiness baseline init` (25 falsos-positivos pré-existentes do knip suprimidos: deps Nuxt, `multer`, `@sentiness/check-*`, `eslint`). `newInDiff` limpo. Issue de dogfooding aberta: https://github.com/Arateki/Sentiness/issues/7 (knip flaga os próprios `@sentiness/check-*` e `eslint` como deps não usadas out of the box; + Nuxt/deps dinâmicas).
+
 ## Decisões pendentes
 
 Nenhuma bloqueante. Pontos menores ficam para o Specify de cada feature (ex.: intervalo/transição do modo teatro, default do checkbox favorita no upload).
@@ -36,6 +41,7 @@ Nenhum.
 
 - A API tem convenções sutis que quebram fácil num porte: keys S3 relativas no banco com `setImagesUrl` na saída e strip de URL na edição; `files[i]`↔`versionNames[i]` por índice; deep-link por `id` que expande o limit. Cobrir com testes de contrato antes do switch (TESTING.md).
 - Vuetify do front antigo está em `^3.0.0-beta.0` — não rodar `npm install` no projeto legado sem lockfile.
+- **Convenções do porte NestJS (F2), úteis para futuras features da API:** o Biome do projeto não parseia *parameter decorators* — usar `@Bind(Body()/Param()/Query()/UploadedFiles())` no método (nunca `@Body() x` no parâmetro); DTOs e serviços injetados precisam de **value import** com `// biome-ignore lint/style/useImportType` (senão a DI quebra em runtime — metadata apagada); cuidado com imports multi-especificador (o Biome converte o specifier só-tipo para `type`, quebrando DI — separar a constante em outro arquivo). Mongoose 9 usa `QueryFilter`/`UpdateQuery` (não `FilterQuery`). `exactOptionalPropertyTypes` exige spreads condicionais (`...(x !== undefined && { x })`) em vez de `key: undefined`.
 
 ## Ideias futuras (deferred)
 

@@ -11,19 +11,25 @@
     "lint:biome": "biome check .",
     "format": "biome format --write .",
     "typecheck": "pnpm -r --if-present typecheck",
-    "test": "pnpm -r --if-present test",
+    "test": "pnpm test:legacy-resize && pnpm --filter web test && pnpm --filter api test",
+    "test:legacy-resize": "vitest run tests/legacy-resize",
+    "visual:legacy": "playwright test -c playwright.legacy.config.ts",
+    "visual:legacy:update": "playwright test -c playwright.legacy.config.ts --update-snapshots",
     "build": "pnpm -r --if-present build"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.16",
+    "@playwright/test": "1.60.0",
     "@sentiness/check-biome": "0.1.0",
     "@sentiness/check-deps-diff": "0.1.0",
     "@sentiness/check-eslint": "0.1.0",
     "@sentiness/check-knip": "0.1.0",
+    "@sentiness/check-playwright": "0.1.0",
     "@sentiness/core": "0.1.3",
     "eslint": "10.4.1",
     "knip": "6.16.1",
-    "typescript": "6.0.3"
+    "typescript": "6.0.3",
+    "vitest": "4.1.8"
   },
   "pnpm": {
     "overrides": {
