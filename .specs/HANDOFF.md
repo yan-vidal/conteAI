@@ -2,49 +2,46 @@
 
 **Date:** 2026-06-14
 **Repository:** `https://github.com/yan-vidal/conteAI`
-**Branch:** `f3-visual-baseline` (F3 Fase 0 + F2 vivem aqui)
-**Last feature:** F2 — Porte da API para NestJS (`.specs/features/02-api-nest-port/`) — **CONCLUÍDA**
+**Branch atual:** `f3-web-nuxt` (criada a partir de `main` após o merge do PR #1)
+**Feature em andamento:** F3 — Frontend Nuxt + Favoritas (`.specs/features/03-web-nuxt-favoritas/`)
 
 ## Completed ✓
 
-- **F1** scaffolding do monorepo (pnpm, Node 26, NestJS/Nuxt skeletons, Biome/ESLint, Vitest, CI, Sentiness).
-- **F3 Fase 0** baseline de paridade visual: goldens Playwright do front legado (6 viewports × estados) em `tests/visual/goldens/legacy/` + characterization tests do `resize()` em `tests/legacy-resize/`.
-- **F2** porte completo da API (T1–T16, todas concluídas em `.specs/features/02-api-nest-port/tasks.md`):
-  - Config/bootstrap, harness de contrato, schemas Mongoose, helpers de URL.
-  - Auth (JWT 1h, guard 401, throttle), geo (countries/states/cities), tags (+ `/tags/sync`).
-  - Storage S3, Google Vision/Geocoding, EXIF/derivativos (sharp).
-  - Imagens: listagem (filtros + deep-link), edit/delete, upload multipart (pipeline + rollback).
-  - Aceitação documentada em `.specs/features/02-api-nest-port/acceptance.md`.
+- **F1** scaffolding do monorepo. **F3 Fase 0** baseline visual (goldens em `tests/visual/goldens/legacy/`, characterization `resize()` em `tests/legacy-resize/`).
+- **F2** porte completo da API NestJS (T1–T16) — **mergeado em `main`** via PR #1. Aceitação em `.specs/features/02-api-nest-port/acceptance.md`.
+- **F3 — breakdown do porte completo criado** em `.specs/features/03-web-nuxt-favoritas/tasks.md` (seção "Porte completo (execução)", tarefas P1–P10).
+- **F3 P1 — API favoritas** (commit `d47cbfb`): `favorite?: boolean` (default false) em `Image` + `@conteai/shared`; `GET /images?favorite=true|false`; upload/edit aceitam `favorite`. 79 testes da API verdes.
+- **F3 P2 — Fundação web** (commit `9b1275a`): `apps/web/composables/useApi.ts` (tipado, `NUXT_PUBLIC_API_URL`, token), stores Pinia `auth`/`theme` (setup-syntax, persistidas via `@pinia-plugin-persistedstate/nuxt`); `@conteai/shared` é dep do web. 4 testes web verdes.
 
-## Last Verification (Node 26, 2026-06-14)
+## Decisões de execução da F3 (adotadas das sugestões da spec)
 
-- `pnpm lint` · `pnpm typecheck` · `pnpm build` — OK.
-- `pnpm test` — **77 testes, 21 arquivos** (e2e precisam rodar fora da sandbox: Supertest abre socket local).
-- `pnpm exec sentiness check --tier=standard --trigger=pre-done` — `status: ok` (baseline reinicializado, ver nota abaixo).
+- Upload com checkbox "Favorita" **marcado** por padrão (R10).
+- Toggle da galeria via `?all=true` na URL; ausência = só favoritas (R9).
 
 ## Next Step
 
-**Executar a F3 — porte completo do frontend para `apps/web` (Nuxt).**
+**Retomar a F3 na tarefa P3** (ver `tasks.md`). Ordem sugerida: P3 → P4 → P7 → P5 → P6 → P8 → P9 → P10.
 
-Ler primeiro:
-- `.specs/features/03-web-nuxt-favoritas/spec.md` (telas, favoritas por padrão, deep-links).
-- `.specs/features/03-web-nuxt-favoritas/tasks.md`.
-- Goldens da Fase 0 em `tests/visual/goldens/legacy/` — comparar o porte contra eles (thresholds tolerantes, masks em elementos novos; nunca atualizar goldens para silenciar diff não compreendido).
-- A API nova (F2) já roda e mantém o contrato; pode ser usada como backend do novo front.
+- **P3** rotas + middleware de auth (`/`→`/gallery`, `/secretdoor`, `/upload`/`/list` client-only com token Pinia) + layout base/HeaderBar.
+- **P4** portar `resize()` de `tests/legacy-resize/legacyResize.ts` para `apps/web` e provar contra a fixture golden.
+- **P5** GalleryView (filtros cascata, infinite scroll, sync URL, SSR 1ª página via `useAsyncData`, default favoritas + toggle `?all=true` + empty-state, deep-link R11). **Ordenação default `metadata.takenAt desc` é invariante.**
+- **P6** ModalViewerImage (usa P4) · **P7** Login · **P8** Upload · **P9** List/Edit · **P10** regressão visual vs goldens + Vitest + aceitação.
 
-## Blockers
+Ler primeiro: `.specs/features/03-web-nuxt-favoritas/spec.md` e a seção P1–P10 de `tasks.md`. Front legado de referência em `yan-site-front-vue/src/` (GalleryView, ModalViewerImage, ModalEditImage, UploadImages, LoginView; store Vuex; `plugins/api.js`).
 
-Nenhum funcional. Item de infra (não bloqueia F2): ver nota de dogfooding.
+## Context / Convenções
 
-## Context
+- Padrões do porte API (úteis se mexer em `apps/api`): ver "Lições aprendidas" no `STATE.md` (Biome sem parameter decorators → `@Bind`; value-import + `biome-ignore` para DI; Mongoose 9 `QueryFilter`/`UpdateQuery`; `exactOptionalPropertyTypes` → spreads condicionais).
+- Web: stores Pinia em **sintaxe setup** (evita warning de auto-import); ambiente de teste vitest = `nuxt` (`mockNuxtImport` + `setActivePinia(createPinia())`).
+- **API nova roda como backend do front novo** (`NUXT_PUBLIC_API_URL`).
+- **Sentiness baseline** reinicializado na F2 (suprime falsos-positivos pré-existentes do knip). Nunca editar baseline/config para silenciar achados NOVOS. Issue de dogfooding: https://github.com/Arateki/Sentiness/issues/7.
+- Uncommitted: nenhum (verificar `git status`). Branch `f3-web-nuxt` ainda não tem PR.
 
-- Uncommitted: nenhum após o commit da T16 (verificar `git status`).
-- **Sentiness baseline:** estava vazio; reinicializado via `sentiness baseline init` (decisão do Yan). Suprime 25 falsos-positivos pré-existentes do knip (deps Nuxt, `multer` via `FilesInterceptor`, `@sentiness/check-*`, `eslint`, exports de scaffolding). `newInDiff` limpo. Reportar ao repo Sentiness: knip sem config para Nuxt e deps dinâmicas. **Nunca editar baseline/config para silenciar achados NOVOS.**
-- Smoke manual do front legado contra a API Nest está pendente de infra real (checklist em `acceptance.md`) — validar antes do cutover (F7).
-- Bugs do legado já corrigidos no porte estão listados como "exceções de contrato" em `acceptance.md`.
+## Invariants (não quebrar)
+
+- Deep-links `/gallery?id=&version=&city=...` idênticos; ordenação default `metadata.takenAt desc`; rota `/secretdoor`; contrato `{ images, total }`.
+- Goldens da Fase 0 não devem ser atualizados para silenciar diff não compreendido; fotos pinadas não editadas.
 
 ## Suggested Skills
 
-- `tlc-spec-driven`: retomar pela F3 (`specify`/`design`/`tasks` já existem; ir para execução).
-- `sentiness`: `pending` no início, tier fast pós-edit, standard antes de concluir.
-- `superpowers:systematic-debugging` e `superpowers:verification-before-completion`.
+- `tlc-spec-driven` (executar P3+), `sentiness` (`pending` no início, fast pós-edit, standard pré-done), `superpowers:systematic-debugging`, `superpowers:verification-before-completion`.
