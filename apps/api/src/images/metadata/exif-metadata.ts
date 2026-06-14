@@ -1,6 +1,6 @@
 import { load as loadExif } from "exifreader";
 
-export interface RawExifTag {
+interface RawExifTag {
   value?: unknown;
   description?: unknown;
 }

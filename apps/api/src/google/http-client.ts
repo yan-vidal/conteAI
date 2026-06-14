@@ -1,6 +1,6 @@
 export const HTTP_CLIENT = Symbol("HTTP_CLIENT");
 
-export interface HttpResponse<T> {
+interface HttpResponse<T> {
   status: number;
   data: T;
 }
