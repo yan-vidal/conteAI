@@ -83,7 +83,7 @@ Status: [ ] pendente · [x] concluida. Gates: `pnpm --filter api test` (API), `p
 **Depende de:** P1 (tipos shared).
 **Done when:** `useApi` lista `/images` e `/countries` em dev; token persiste; typecheck/test web verdes.
 **Commit:** `feat(web): api client and pinia stores`
-- [ ]
+- [x] concluida em 2026-06-14. `composables/useApi.ts` (tipado com `@conteai/shared`, `NUXT_PUBLIC_API_URL`, headers de auth); stores Pinia setup-syntax `auth` (token/payload/login/logout, persistido) e `theme` (dark/toggle, persistido) via `@pinia-plugin-persistedstate/nuxt`; `@conteai/shared` adicionado como dep do web. Stores em sintaxe setup para evitar colisão de auto-import. 4 testes web verdes.
 
 ## P3 — Web: rotas + middleware de auth (R1)
 **O que:** `/` → redirect `/gallery`; `/gallery` (SSR público); `/secretdoor` (login); `/upload` e `/list` (client-only, middleware exige token Pinia). Layout base + HeaderBar portado.

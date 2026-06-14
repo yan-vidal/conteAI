@@ -6,7 +6,12 @@ export default defineNuxtConfig({
   devServer: {
     port: 3001,
   },
-  modules: ["vuetify-nuxt-module", "@pinia/nuxt", "@nuxtjs/i18n"],
+  modules: [
+    "vuetify-nuxt-module",
+    "@pinia/nuxt",
+    "@pinia-plugin-persistedstate/nuxt",
+    "@nuxtjs/i18n",
+  ],
   css: ["@mdi/font/css/materialdesignicons.css"],
   runtimeConfig: {
     public: {
