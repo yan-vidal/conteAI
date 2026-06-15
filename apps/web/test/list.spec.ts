@@ -110,6 +110,12 @@ describe("image list page", () => {
     await component
       .get("[data-testid='edit-original-thumbnail-url']")
       .setValue("https://cdn.test/img-2-original-new-thumb.jpg");
+    await component
+      .get("[data-testid='edit-original-lazy-thumbnail']")
+      .setValue("data:image/webp;base64,original-edited");
+    await component
+      .get("[data-testid='edit-version-0-lazy-thumbnail']")
+      .setValue("data:image/webp;base64,version-edited");
     await component.get("[data-testid='save-image']").trigger("click");
     await flushPromises();
 
@@ -121,6 +127,7 @@ describe("image list page", () => {
         favorite: true,
         images: [
           expect.objectContaining({
+            lazyThumbnailBase64: "data:image/webp;base64,version-edited",
             optimizedUrl: "https://cdn.test/img-2-edited-optimized.jpg",
           }),
         ],
@@ -128,6 +135,7 @@ describe("image list page", () => {
           takenAt: "2026-06-11T12:00:00.000Z",
         }),
         original: expect.objectContaining({
+          lazyThumbnailBase64: "data:image/webp;base64,original-edited",
           thumbnailUrl: "https://cdn.test/img-2-original-new-thumb.jpg",
         }),
       }),

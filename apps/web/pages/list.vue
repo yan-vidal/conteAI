@@ -345,6 +345,14 @@ const loadMore = async (): Promise<void> => {
               type="url"
             >
           </label>
+          <label>
+            {{ $t("list.lazyThumbnail") }}
+            <input
+              v-model="selectedImage.original.lazyThumbnailBase64"
+              data-testid="edit-original-lazy-thumbnail"
+              type="text"
+            >
+          </label>
 
           <h3>{{ $t("list.metadata") }}</h3>
           <label>
@@ -385,6 +393,12 @@ const loadMore = async (): Promise<void> => {
               v-model="version.fullSizeUrl"
               :data-testid="`edit-version-${index}-full-size-url`"
               type="url"
+            >
+            {{ $t("list.lazyThumbnail") }}
+            <input
+              v-model="version.lazyThumbnailBase64"
+              :data-testid="`edit-version-${index}-lazy-thumbnail`"
+              type="text"
             >
           </label>
         </div>

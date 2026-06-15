@@ -42,6 +42,7 @@
     "eyebrow": "Administration",
     "favorite": "Favorite",
     "fullSizeUrl": "Full-size URL",
+    "lazyThumbnail": "Base64 lazy thumbnail",
     "loadMore": "Load more",
     "metadata": "Metadata",
     "optimizedUrl": "Optimized URL",
