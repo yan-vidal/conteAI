@@ -1,6 +1,9 @@
 <template>
   <v-container class="gallery-shell">
-    <section class="gallery-header">
+    <section
+      v-if="!selectedImage && !showAll"
+      class="gallery-header"
+    >
       <div>
         <p class="eyebrow">
           {{ $t("gallery.eyebrow") }}
@@ -67,18 +70,31 @@
         multiple
         variant="solo-filled"
       />
-      <v-select
-        v-model="selectedTags"
-        clearable
-        density="compact"
-        :items="tags"
-        item-title="name"
-        item-value="name"
-        :label="$t('gallery.tags')"
-        multiple
-        variant="solo-filled"
-      />
     </section>
+
+    <div
+      class="theme-switch-top"
+      aria-label="Gallery theme"
+    >
+      <v-icon
+        class="switch-icon"
+        size="16"
+      >
+        mdi-white-balance-sunny
+      </v-icon>
+      <v-switch
+        :model-value="dark"
+        density="compact"
+        hide-details
+        @update:model-value="toggleTheme"
+      />
+      <v-icon
+        class="switch-icon"
+        size="16"
+      >
+        mdi-weather-night
+      </v-icon>
+    </div>
 
     <dl
       class="query-preview"
@@ -140,7 +156,9 @@
             :src="thumbnailUrl(image)"
           >
         </button>
-        <figcaption>{{ imageAlt(image) }}</figcaption>
+        <figcaption class="sr-only">
+          {{ imageAlt(image) }}
+        </figcaption>
       </figure>
     </section>
 
@@ -161,16 +179,61 @@
       </button>
     </section>
 
-    <div class="load-more">
-      <v-btn
-        v-if="hasMore"
-        :loading="loadingMore"
-        variant="tonal"
-        @click="loadMore"
-      >
-        {{ $t("gallery.loadMore") }}
-      </v-btn>
+    <div
+      ref="loadSentinel"
+      class="load-more"
+    >
+      <v-progress-circular
+        v-if="hasMore && (filling || loadingMore)"
+        indeterminate
+        size="32"
+      />
     </div>
+
+    <section
+      class="filters-bottom"
+      aria-label="Gallery secondary filters"
+    >
+      <v-btn
+        class="bottom-pill date-pill"
+        variant="flat"
+      >
+        {{ $t("gallery.date") }}
+      </v-btn>
+      <v-select
+        v-model="selectedTags"
+        class="bottom-tags"
+        clearable
+        density="compact"
+        hide-details
+        :items="tags"
+        item-title="name"
+        item-value="name"
+        :label="$t('gallery.tags')"
+        multiple
+        variant="solo-filled"
+      />
+      <div class="theme-switch-wrapper">
+        <v-icon
+          class="switch-icon"
+          size="16"
+        >
+          mdi-white-balance-sunny
+        </v-icon>
+        <v-switch
+          :model-value="dark"
+          density="compact"
+          hide-details
+          @update:model-value="toggleTheme"
+        />
+        <v-icon
+          class="switch-icon"
+          size="16"
+        >
+          mdi-weather-night
+        </v-icon>
+      </div>
+    </section>
 
     <ModalViewerImage
       v-if="selectedImage"
@@ -182,6 +245,35 @@
       @prev="changeImage(-1)"
       @version="setVersion"
     />
+    <div
+      v-if="selectedImage"
+      class="nav-buttons"
+    >
+      <v-btn
+        aria-label="Previous image"
+        class="nav-button"
+        data-testid="prev-image"
+        icon="mdi-chevron-left"
+        type="button"
+        @click="changeImage(-1)"
+      />
+      <v-btn
+        aria-label="Rotate image"
+        class="nav-button"
+        data-testid="rotate-image"
+        :icon="isRotated ? 'mdi-rotate-right' : 'mdi-rotate-left'"
+        type="button"
+        @click="toggleRotation"
+      />
+      <v-btn
+        aria-label="Next image"
+        class="nav-button"
+        data-testid="next-image"
+        icon="mdi-chevron-right"
+        type="button"
+        @click="changeImage(1)"
+      />
+    </div>
   </v-container>
 </template>
 
@@ -193,11 +285,22 @@ import type {
   State,
   Tag,
 } from "@conteai/shared";
-import { computed, ref, watch } from "vue";
-import type { LocationQueryValue } from "vue-router";
+import { storeToRefs } from "pinia";
+import {
+  computed,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  watch,
+} from "vue";
+import { useTheme as useVuetifyTheme } from "vuetify";
 import { useAsyncData, useRoute, useRouter } from "#imports";
 import ModalViewerImage from "../components/ModalViewerImage.vue";
 import { type GalleryQuery, useApi } from "../composables/useApi.js";
+import { useThemeStore } from "../stores/theme.js";
+
+type RouteQueryValue = string | null;
 
 interface FilterData {
   readonly countries: Country[];
@@ -210,9 +313,16 @@ const perPage = 30;
 const route = useRoute();
 const router = useRouter();
 const api = useApi();
+const themeStore = useThemeStore();
+const { dark, vuetifyTheme } = storeToRefs(themeStore);
+const vuetifyThemeService = useVuetifyTheme();
+
+const toggleTheme = (): void => {
+  themeStore.toggle();
+};
 
 const toQueryArray = (
-  value: LocationQueryValue | LocationQueryValue[] | undefined,
+  value: RouteQueryValue | RouteQueryValue[] | undefined,
 ): string[] => {
   if (Array.isArray(value)) {
     return value.filter((entry): entry is string => entry !== null);
@@ -222,7 +332,7 @@ const toQueryArray = (
 };
 
 const toQueryText = (
-  value: LocationQueryValue | LocationQueryValue[] | undefined,
+  value: RouteQueryValue | RouteQueryValue[] | undefined,
 ): string => {
   if (Array.isArray(value)) {
     return value.filter((entry): entry is string => entry !== null).join(",");
@@ -432,6 +542,7 @@ const replaceRouteQuery = async (): Promise<void> => {
 
 const openImage = async (image: ImageDocument): Promise<void> => {
   selectedImage.value = image;
+  isRotated.value = false;
   idOpen.value = image._id ?? "";
   versionOpen.value = image.images.length > 0 ? "1" : "original";
   await replaceRouteQuery();
@@ -439,9 +550,14 @@ const openImage = async (image: ImageDocument): Promise<void> => {
 
 const closeImage = async (): Promise<void> => {
   selectedImage.value = null;
+  isRotated.value = false;
   idOpen.value = "";
   versionOpen.value = "";
   await replaceRouteQuery();
+};
+
+const toggleRotation = (): void => {
+  isRotated.value = !isRotated.value;
 };
 
 const setVersion = async (version: string): Promise<void> => {
@@ -484,6 +600,9 @@ const refreshImages = async (): Promise<void> => {
     items.value = [];
     total.value = 0;
   }
+
+  await nextTick();
+  await fillToViewport();
 };
 
 const setAllMode = async (allMode: boolean): Promise<void> => {
@@ -511,6 +630,62 @@ const loadMore = async (): Promise<void> => {
   }
 };
 
+const filling = ref(false);
+const loadSentinel = ref<globalThis.HTMLElement | null>(null);
+let scrollObserver: globalThis.IntersectionObserver | null = null;
+
+const isSentinelVisible = (): boolean => {
+  const el = loadSentinel.value;
+  if (!el) {
+    return false;
+  }
+
+  const rect = el.getBoundingClientRect();
+  return rect.top < globalThis.window.innerHeight && rect.bottom > 0;
+};
+
+// Mimic the legacy v-infinite-scroll: keep loading pages while the sentinel
+// stays within the viewport instead of waiting for a manual button click.
+const fillToViewport = async (): Promise<void> => {
+  if (filling.value) {
+    return;
+  }
+
+  filling.value = true;
+  try {
+    let guard = 0;
+    while (hasMore.value && isSentinelVisible() && guard < 50) {
+      guard += 1;
+      await loadMore();
+      await nextTick();
+    }
+  } finally {
+    filling.value = false;
+  }
+};
+
+onMounted(async () => {
+  await nextTick();
+  await fillToViewport();
+
+  if (typeof globalThis.IntersectionObserver === "undefined") {
+    return;
+  }
+
+  scrollObserver = new globalThis.IntersectionObserver((entries) => {
+    if (entries.some((entry) => entry.isIntersecting)) {
+      void fillToViewport();
+    }
+  });
+  if (loadSentinel.value) {
+    scrollObserver.observe(loadSentinel.value);
+  }
+});
+
+onBeforeUnmount(() => {
+  scrollObserver?.disconnect();
+});
+
 watch(
   [selectedCountries, selectedStates, selectedCities, selectedTags],
   async () => {
@@ -523,6 +698,14 @@ watch(
   { deep: true },
 );
 
+watch(
+  vuetifyTheme,
+  (themeName) => {
+    vuetifyThemeService.change(themeName);
+  },
+  { immediate: true },
+);
+
 if (showAll.value && toQueryText(route.query.all) !== "true") {
   await replaceRouteQuery();
 }
@@ -530,8 +713,8 @@ if (showAll.value && toQueryText(route.query.all) !== "true") {
 
 <style scoped>
 .gallery-shell {
-  min-height: calc(100vh - 40px);
-  padding-block: 24px 96px;
+  min-height: 100vh;
+  padding: 10px 10px 150px;
 }
 
 .gallery-header {
@@ -565,9 +748,36 @@ h1 {
 
 .filters {
   display: grid;
-  gap: 10px;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  margin-block: 20px 12px;
+  gap: 24px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 4px 0 18px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.theme-switch-top {
+  align-items: center;
+  background: rgb(var(--v-theme-background));
+  display: flex;
+  justify-content: center;
+  position: absolute;
+  right: 20px;
+  top: 12px;
+  z-index: 11;
+}
+
+:deep(.v-select .v-label) {
+  font-size: 12px;
+  transform: translateY(-11px);
+}
+
+:deep(.v-select__menu-icon) {
+  display: none;
+}
+
+:deep(.v-field) {
+  border-radius: 100px !important;
 }
 
 .query-preview {
@@ -576,8 +786,29 @@ h1 {
 
 .image-grid {
   display: grid;
-  gap: 12px;
-  grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+  gap: 16px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  padding-inline: 6px;
+}
+
+/* Match legacy Vuetify grid breakpoints (sm:600, md:960, lg:1264, xl:1904)
+   with columns from img-cols (cols=3 / md=4 / lg=6 / xl=12). */
+@media (min-width: 960px) {
+  .image-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1264px) {
+  .image-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1904px) {
+  .image-grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
 }
 
 .image-tile {
@@ -599,16 +830,28 @@ h1 {
 .image-button img {
   aspect-ratio: 1;
   border-radius: 8px;
+  box-shadow: 4px 10px 5px rgba(0, 0, 0, 0.4);
   display: block;
   object-fit: cover;
+  transition: filter 0.3s ease-in-out, transform 0.3s ease-in-out;
   width: 100%;
 }
 
-.image-tile figcaption {
-  font-size: 0.8125rem;
-  line-height: 1.3;
-  margin-top: 6px;
-  overflow-wrap: anywhere;
+.image-button:hover img {
+  filter: brightness(1.08);
+  transform: scale(1.05);
+}
+
+.sr-only {
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
 }
 
 .empty-state {
@@ -646,13 +889,81 @@ h1 {
   margin-top: 24px;
 }
 
+.filters-bottom {
+  align-items: center;
+  bottom: 15px;
+  display: grid;
+  gap: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  left: 50%;
+  position: fixed;
+  transform: translateX(-50%);
+  width: 90vw;
+  z-index: 100;
+}
+
+.bottom-pill,
+.theme-switch-wrapper {
+  background: rgb(var(--v-theme-surface));
+  border-radius: 100px;
+  min-height: 40px;
+}
+
+.bottom-pill {
+  text-transform: none;
+}
+
+.theme-switch-wrapper {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  padding: 0 4px;
+}
+
+.theme-switch-wrapper {
+  display: none;
+}
+
+.switch-icon {
+  flex: 0 0 auto;
+}
+
+.nav-buttons {
+  bottom: 30px;
+  display: flex;
+  gap: 8px;
+  left: 50%;
+  position: fixed;
+  transform: translateX(-50%);
+  z-index: 2401;
+}
+
+.nav-button {
+  background: rgba(0, 0, 0, 0.86);
+  color: #fff;
+}
+
 @media (max-width: 720px) {
   .gallery-header {
     display: grid;
   }
 
+  .theme-switch-top {
+    display: none;
+  }
+
   .filters {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .filters-bottom {
+    gap: 12px;
+    grid-template-columns: minmax(86px, 1fr) minmax(86px, 1fr) minmax(92px, 1fr);
+  }
+
+  .theme-switch-wrapper {
+    display: flex;
   }
 }
 </style>

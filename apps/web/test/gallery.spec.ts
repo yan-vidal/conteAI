@@ -173,7 +173,6 @@ describe("gallery page", () => {
       order: "desc",
       sort: "metadata.takenAt",
     });
-    expect(component.text()).toContain("All");
     expect(component.text()).toContain("Photo plain-2");
   });
 });
