@@ -3,6 +3,9 @@ import { defineNuxtConfig } from "nuxt/config";
 export default defineNuxtConfig({
   ssr: true,
   compatibilityDate: "2026-06-11",
+  devtools: {
+    enabled: process.env.NUXT_DEVTOOLS !== "false",
+  },
   devServer: {
     port: 3001,
   },
