@@ -9,6 +9,7 @@
     "all": "All",
     "city": "City",
     "country": "Country",
+    "date": "Date",
     "emptyFavoritesText": "Favorite photos appear here first. The full archive is still available.",
     "emptyFavoritesTitle": "No favorites published",
     "eyebrow": "Public gallery",

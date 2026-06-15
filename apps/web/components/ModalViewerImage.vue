@@ -2,137 +2,367 @@
   <section
     class="modal-viewer"
     data-testid="modal-viewer"
-    :style="modalStyle"
     tabindex="0"
+    @click.self="$emit('close')"
     @keydown="handleKeyDown"
-    @touchend="handleTouchEnd"
-    @touchstart="handleTouchStart"
   >
-    <div class="viewer-stage">
-      <button
-        class="close-button"
-        type="button"
-        @click="$emit('close')"
-      >
-        <span aria-hidden="true">×</span>
-      </button>
+    <div
+      class="viewer-stage"
+      :class="{ rotated: isRotated }"
+      data-testid="viewer-stage"
+      :style="modalStyle"
+      @mouseleave="onStageLeave"
+      @mouseover="onStageOver"
+      @touchend="handleTouchEnd"
+      @touchstart="handleTouchStart"
+    >
       <img
         :alt="imageAlt"
         data-testid="modal-image"
         :src="activeVersion.optimizedUrl"
       >
-      <div class="version-controls">
-        <button
-          v-for="(versionItem, index) in image.images"
-          :key="versionItem.optimizedUrl"
-          :class="{ active: !showOriginal && activeIndex === index }"
-          type="button"
-          @click="selectVersion(index)"
-        >
-          {{ versionItem.versionName || `V${index + 1}` }}
-        </button>
-        <button
-          :class="{ active: showOriginal }"
-          type="button"
-          @click="selectOriginal"
-        >
-          Original
-        </button>
-      </div>
-    </div>
-
-    <aside class="viewer-details">
-      <p class="location">
-        {{ locationText }}
-      </p>
-      <div
-        v-if="mapsLink && streetViewLink"
-        class="location-links"
-      >
-        <a
-          data-testid="maps-link"
-          :href="mapsLink"
-          rel="noreferrer"
-          target="_blank"
-        >
-          Google Maps
-        </a>
-        <a
-          data-testid="street-view-link"
-          :href="streetViewLink"
-          rel="noreferrer"
-          target="_blank"
-        >
-          Street View
-        </a>
-      </div>
-
-      <dl class="metadata">
-        <div v-if="image.metadata.camera">
-          <dt>Camera</dt>
-          <dd>{{ image.metadata.camera }}</dd>
-        </div>
-        <div v-if="image.metadata.lens">
-          <dt>Lens</dt>
-          <dd>{{ image.metadata.lens }}</dd>
-        </div>
-        <div v-if="image.metadata.shutterSpeed">
-          <dt>Shutter</dt>
-          <dd>{{ image.metadata.shutterSpeed }}</dd>
-        </div>
-        <div v-if="image.metadata.aperture">
-          <dt>Aperture</dt>
-          <dd>{{ image.metadata.aperture }}</dd>
-        </div>
-        <div v-if="image.metadata.iso">
-          <dt>ISO</dt>
-          <dd>{{ image.metadata.iso }}</dd>
-        </div>
-        <div>
-          <dt>White balance</dt>
-          <dd>{{ image.metadata.whiteBalance }}</dd>
-        </div>
-      </dl>
-
-      <p
-        v-if="image.description"
-        class="description"
-      >
-        {{ image.description }}
-      </p>
 
       <div
-        class="palette"
-        aria-label="Color palette"
+        v-if="expandedPanelVisible && image.original"
+        class="no-edit-checkbox"
       >
-        <button
-          v-for="(color, index) in activeVersion.colorPalette"
-          :key="`${color.red}-${color.green}-${color.blue}-${index}`"
-          :aria-label="`Copy ${toHexColor(color)}`"
-          class="palette-color"
-          :data-testid="`palette-color-${index}`"
-          :style="{ backgroundColor: toRgbColor(color) }"
-          type="button"
-          @click="copyColorCode(color)"
+        <v-checkbox
+          density="compact"
+          :disabled="onlyOriginal"
+          :false-icon="editIcon"
+          hide-details
+          :model-value="showOriginal"
+          :true-icon="noEditIcon"
+          @update:model-value="toggleOriginal"
         />
       </div>
 
-      <div class="tags">
-        <span
-          v-for="tag in image.tags"
-          :key="tag"
+      <div
+        v-if="expandedPanelVisible && image.images.length > 1"
+        class="custom-delimiters"
+      >
+        <v-radio-group
+          density="compact"
+          hide-details
+          inline
+          :model-value="showOriginal ? null : activeIndex"
+          @update:model-value="onSelectDelimiter"
         >
-          {{ tag }}
-        </span>
+          <v-radio
+            v-for="(versionItem, index) in image.images"
+            :key="versionItem.optimizedUrl"
+            density="compact"
+            :value="index"
+          />
+        </v-radio-group>
       </div>
-    </aside>
+
+      <v-expansion-panels
+        v-if="expandedPanelVisible"
+        v-model="panelExpanded"
+        class="expansion-panel"
+      >
+        <v-expansion-panel class="expansion-box">
+          <v-expansion-panel-title
+            class="expansion-title"
+            hide-actions
+            readonly
+            @click="toggleExpansionPanel"
+          >
+            <v-row justify="space-between">
+              <v-col cols="10">
+                <v-row>
+                  <div class="div-location-button">
+                    <v-menu location="top">
+                      <template #activator="{ props: menuProps }">
+                        <v-btn
+                          class="location-button"
+                          density="comfortable"
+                          size="x-small"
+                          style="max-width: 80%; overflow: hidden"
+                          v-bind="menuProps"
+                        >
+                          <div class="scroll-container">
+                            <div
+                              class="scroll-text"
+                              :data-text="fullLocationText"
+                            >
+                              {{ fullLocationText }}
+                            </div>
+                          </div>
+                        </v-btn>
+                        <v-btn
+                          class="location-button"
+                          density="compact"
+                          icon="mdi-plus"
+                          size="x-small"
+                          v-bind="menuProps"
+                        />
+                      </template>
+                      <v-list
+                        id="location-menu"
+                        bg-color="rgba(0, 0, 0, 0.7)"
+                      >
+                        <div
+                          class="location-full"
+                          @click.stop
+                        >
+                          <span>{{ locationText }}</span>
+                        </div>
+                        <v-list-item
+                          v-if="mapsLink"
+                          class="location-menu"
+                          data-testid="maps-link"
+                          density="compact"
+                          :href="mapsLink"
+                          target="_blank"
+                        >
+                          <v-row>
+                            <v-col cols="3">
+                              <v-icon><CustomMap /></v-icon>
+                            </v-col>
+                            <v-col>
+                              <v-list-item-title>Google Maps</v-list-item-title>
+                            </v-col>
+                          </v-row>
+                        </v-list-item>
+                        <v-list-item
+                          v-if="streetViewLink"
+                          class="location-menu"
+                          data-testid="street-view-link"
+                          density="compact"
+                          :href="streetViewLink"
+                          target="_blank"
+                        >
+                          <v-row>
+                            <v-col cols="3">
+                              <v-icon><CustomStreetView /></v-icon>
+                            </v-col>
+                            <v-col>
+                              <v-list-item-title>Street View</v-list-item-title>
+                            </v-col>
+                          </v-row>
+                        </v-list-item>
+                      </v-list>
+                    </v-menu>
+                  </div>
+                </v-row>
+                <v-row>
+                  <div>
+                    <v-menu location="top">
+                      <template #activator="{ props: menuProps }">
+                        <v-btn
+                          class="datetime-button datetime-photographed"
+                          density="comfortable"
+                          size="x-small"
+                          style="max-width: 82%; overflow: hidden"
+                          v-bind="menuProps"
+                        >
+                          {{ getDateHour(image.metadata.takenAt) }}
+                        </v-btn>
+                        <v-btn
+                          class="datetime-button"
+                          density="compact"
+                          icon="mdi-plus"
+                          size="x-small"
+                          v-bind="menuProps"
+                        />
+                      </template>
+                      <v-list
+                        id="datetime-menu"
+                        bg-color="rgba(0, 0, 0, 0.7)"
+                        @click.stop
+                      >
+                        <v-list-item
+                          class="datetime-menu"
+                          density="compact"
+                        >
+                          <v-row>
+                            <v-col cols="2">
+                              <v-icon><CustomPhotographed /></v-icon>
+                            </v-col>
+                            <v-col>
+                              <v-list-item-title>
+                                {{ getDateHour(image.metadata.takenAt) }}
+                              </v-list-item-title>
+                            </v-col>
+                          </v-row>
+                        </v-list-item>
+                        <v-list-item
+                          class="datetime-menu"
+                          density="compact"
+                        >
+                          <v-row>
+                            <v-col cols="2">
+                              <v-icon><CustomPost /></v-icon>
+                            </v-col>
+                            <v-col>
+                              <v-list-item-title>
+                                {{ getDateHour(image.createdAt) }}
+                              </v-list-item-title>
+                            </v-col>
+                          </v-row>
+                        </v-list-item>
+                      </v-list>
+                    </v-menu>
+                  </div>
+                </v-row>
+              </v-col>
+              <v-col
+                class="d-flex justify-end arrow-expand-panel"
+                cols="2"
+              >
+                <v-btn
+                  class="expand-button"
+                  density="compact"
+                  :icon="panelExpanded === null ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+                  size="small"
+                />
+              </v-col>
+            </v-row>
+          </v-expansion-panel-title>
+          <v-expansion-panel-text>
+            <v-card class="card-pallete-colors">
+              <v-row
+                align="center"
+                justify="center"
+              >
+                <v-col
+                  class="align-center"
+                  cols="auto"
+                >
+                  <div class="color-palette">
+                    <button
+                      v-for="(color, index) in activeVersion.colorPalette"
+                      :key="`${color.red}-${color.green}-${color.blue}-${index}`"
+                      :aria-label="`Copy ${toHexColor(color)}`"
+                      class="color-box"
+                      :data-testid="`palette-color-${index}`"
+                      :style="{ backgroundColor: toRgbColor(color) }"
+                      type="button"
+                      @click="copyColorCode(color)"
+                    />
+                  </div>
+                </v-col>
+              </v-row>
+            </v-card>
+            <v-card class="card-description-tags">
+              <v-tabs
+                v-model="tab"
+                align-tabs="center"
+                color="white"
+                density="compact"
+              >
+                <v-row justify="center">
+                  <v-col :cols="image.description ? 4 : 6">
+                    <v-tab :value="1">
+                      <v-icon icon="mdi-cog-outline" />
+                    </v-tab>
+                  </v-col>
+                  <v-col
+                    v-if="image.description"
+                    cols="4"
+                  >
+                    <v-tab :value="2">
+                      <v-icon icon="mdi-text-box-outline" />
+                    </v-tab>
+                  </v-col>
+                  <v-col :cols="image.description ? 4 : 6">
+                    <v-tab :value="3">
+                      <v-icon icon="mdi-tag-multiple" />
+                    </v-tab>
+                  </v-col>
+                </v-row>
+              </v-tabs>
+              <v-card-text
+                class="text-specs-description-tags"
+                :style="{ 'max-height': heightThirtyPercent, 'overflow-y': 'auto' }"
+              >
+                <v-tabs-window v-model="tab">
+                  <v-tabs-window-item :value="1">
+                    <v-row>
+                      <v-col class="d-flex justify-space-between">
+                        <v-icon><CustomCamera /></v-icon>
+                        {{ image.metadata.camera }}
+                      </v-col>
+                      <v-col class="d-flex justify-space-between">
+                        <v-icon><CustomLens /></v-icon>
+                        {{ image.metadata.lens?.substring(0, 18) }}
+                      </v-col>
+                    </v-row>
+                    <v-row>
+                      <v-col class="d-flex justify-space-between">
+                        <v-icon><CustomShutterSpeed /></v-icon>
+                        {{ image.metadata.shutterSpeed }}
+                      </v-col>
+                      <v-col class="d-flex justify-space-between">
+                        <v-icon><CustomAperture /></v-icon>
+                        {{ image.metadata.aperture }}
+                      </v-col>
+                    </v-row>
+                    <v-row>
+                      <v-col class="d-flex justify-space-between">
+                        <v-icon><CustomIso /></v-icon>
+                        {{ image.metadata.iso }}
+                      </v-col>
+                      <v-col class="d-flex justify-space-between">
+                        <v-icon><CustomWhiteBalance /></v-icon>
+                        {{ image.metadata.whiteBalance }}
+                      </v-col>
+                    </v-row>
+                  </v-tabs-window-item>
+                  <v-tabs-window-item
+                    v-if="image.description"
+                    :value="2"
+                  >
+                    {{ image.description }}
+                  </v-tabs-window-item>
+                  <v-tabs-window-item :value="3">
+                    <v-chip-group column>
+                      <v-chip
+                        v-for="tag in image.tags"
+                        :key="tag"
+                        class="non-clickable"
+                      >
+                        {{ tag }}
+                      </v-chip>
+                    </v-chip-group>
+                  </v-tabs-window-item>
+                </v-tabs-window>
+              </v-card-text>
+            </v-card>
+          </v-expansion-panel-text>
+        </v-expansion-panel>
+      </v-expansion-panels>
+    </div>
+
+    <v-snackbar
+      v-model="toastInfo"
+      class="v-snackbar"
+      location="top"
+    >
+      {{ toastMessage }}
+    </v-snackbar>
   </section>
 </template>
 
 <script setup lang="ts">
 import type { ColorPalette, ImageDocument, ImageVersion } from "@conteai/shared";
-import { computed, ref, watch } from "vue";
-import { calculateModalSize } from "../utils/modalResize.js";
+import { computed, markRaw, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import CustomAperture from "./icons/customAperture.vue";
+import CustomCamera from "./icons/customCamera.vue";
+import CustomEdit from "./icons/customEdit.vue";
+import CustomIso from "./icons/customISO.vue";
+import CustomLens from "./icons/customLens.vue";
+import CustomMap from "./icons/customMap.vue";
+import CustomNoEdit from "./icons/customNoEdit.vue";
+import CustomPhotographed from "./icons/customPhotographed.vue";
+import CustomPost from "./icons/customPost.vue";
+import CustomShutterSpeed from "./icons/customShutterSpeed.vue";
+import CustomStreetView from "./icons/customStreetView.vue";
+import CustomWhiteBalance from "./icons/customWhiteBalance.vue";
+import { getDateHour } from "../utils/date.js";
+import { calculateModalSize, type ModalSize } from "../utils/modalResize.js";
 
 const props = defineProps<{
   readonly image: ImageDocument;
@@ -146,6 +376,10 @@ const emit = defineEmits<{
   prev: [];
   version: [version: string];
 }>();
+
+// v-checkbox icon props accept a component; markRaw avoids reactivity warnings.
+const editIcon = markRaw(CustomEdit);
+const noEditIcon = markRaw(CustomNoEdit);
 
 const versionToIndex = (version: string | undefined): number => {
   const numeric = Number(version);
@@ -162,6 +396,17 @@ const showOriginal = ref(
   props.version === "original" || props.image.images.length === 0,
 );
 const touchStartX = ref<number | null>(null);
+const expandedPanelVisible = ref(false);
+const panelExpanded = ref<number | null>(null);
+const tab = ref(1);
+const toastInfo = ref(false);
+const toastMessage = ref("");
+const modalSize = ref<ModalSize>({ height: "100px", width: "100px" });
+const resizeTimer = ref<ReturnType<typeof globalThis.setTimeout> | null>(null);
+
+const onlyOriginal = computed(
+  () => props.image.images.length === 0 && Boolean(props.image.original),
+);
 
 const activeVersion = computed<ImageVersion>(() =>
   showOriginal.value
@@ -181,6 +426,13 @@ const locationText = computed(() =>
   [props.image.country, props.image.state, props.image.city]
     .filter(Boolean)
     .join(", "),
+);
+
+// Trailing non-breaking spaces give the looping marquee its gap (legacy).
+const fullLocationText = computed(() => `${locationText.value}${"\u00A0".repeat(10)}`);
+
+const heightThirtyPercent = computed(
+  () => `${Number(String(modalSize.value.height).slice(0, -2)) * 0.3}px`,
 );
 
 const mapsLink = computed(() => {
@@ -203,23 +455,50 @@ const streetViewLink = computed(() => {
   return `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${latitude},${longitude}&heading=${cameraTrueDirection ?? 0}&pitch=0&fov=90`;
 });
 
-const modalStyle = computed(() => {
-  const size = calculateModalSize({
+const updateModalSize = (): void => {
+  const documentElement = globalThis.document?.documentElement;
+  const viewportHeight = documentElement?.clientHeight ?? 800;
+  const viewportWidth = documentElement?.clientWidth ?? 1280;
+
+  modalSize.value = calculateModalSize({
     imageHeight: props.image.metadata.optimizedHeight,
     imageWidth: props.image.metadata.optimizedWidth,
     isRotated: props.isRotated,
-    viewportHeight: globalThis.document?.documentElement.clientHeight ?? 800,
-    viewportWidth: globalThis.document?.documentElement.clientWidth ?? 1280,
+    viewportHeight,
+    viewportWidth,
   });
+};
 
-  return {
-    "--modal-image-height": String(size.height),
-    "--modal-image-width": String(size.width),
-  };
-});
+const scheduleResize = (delayMs = 100): void => {
+  if (resizeTimer.value !== null) {
+    globalThis.clearTimeout(resizeTimer.value);
+  }
 
-const toHexPart = (value: number): string =>
-  value.toString(16).padStart(2, "0");
+  resizeTimer.value = globalThis.setTimeout(() => {
+    resizeTimer.value = null;
+    updateModalSize();
+  }, delayMs);
+};
+
+const handleViewportResize = (): void => {
+  scheduleResize();
+};
+
+const handleScreenRotation = (): void => {
+  scheduleResize();
+
+  globalThis.setTimeout(() => {
+    globalThis.window.scrollBy(0, 1);
+    globalThis.window.scrollBy(0, -1);
+  }, 500);
+};
+
+const modalStyle = computed(() => ({
+  "--modal-height": String(modalSize.value.height),
+  "--modal-width": String(modalSize.value.width),
+}));
+
+const toHexPart = (value: number): string => value.toString(16).padStart(2, "0");
 
 const toHexColor = (color: ColorPalette): string =>
   `#${toHexPart(color.red)}${toHexPart(color.green)}${toHexPart(color.blue)}`;
@@ -228,7 +507,10 @@ const toRgbColor = (color: ColorPalette): string =>
   `rgb(${color.red}, ${color.green}, ${color.blue})`;
 
 const copyColorCode = async (color: ColorPalette): Promise<void> => {
-  await globalThis.navigator.clipboard.writeText(toHexColor(color));
+  const hexColor = toHexColor(color);
+  await globalThis.navigator.clipboard.writeText(hexColor);
+  toastMessage.value = `color code copied successfully: ${hexColor}`;
+  toastInfo.value = true;
 };
 
 const selectVersion = (index: number): void => {
@@ -240,6 +522,39 @@ const selectVersion = (index: number): void => {
 const selectOriginal = (): void => {
   showOriginal.value = true;
   emit("version", "original");
+};
+
+const toggleOriginal = (value: boolean | null): void => {
+  if (value) {
+    selectOriginal();
+  } else {
+    selectVersion(activeIndex.value);
+  }
+};
+
+const onSelectDelimiter = (index: number | null): void => {
+  if (index !== null) {
+    selectVersion(index);
+  }
+};
+
+const toggleExpansionPanel = (): void => {
+  panelExpanded.value = panelExpanded.value === null ? 0 : null;
+};
+
+const onStageOver = (): void => {
+  expandedPanelVisible.value = true;
+};
+
+const onStageLeave = (event: globalThis.MouseEvent): void => {
+  // Keep the chrome open while the pointer moves onto a teleported menu overlay.
+  const related = event.relatedTarget;
+
+  if (related instanceof globalThis.HTMLElement && related.closest(".v-overlay")) {
+    return;
+  }
+
+  expandedPanelVisible.value = false;
 };
 
 const handleKeyDown = (event: globalThis.KeyboardEvent): void => {
@@ -273,6 +588,8 @@ const handleTouchEnd = (event: globalThis.TouchEvent): void => {
   touchStartX.value = null;
 
   if (Math.abs(delta) < 40) {
+    // A tap toggles the info chrome, mirroring the legacy touch behaviour.
+    expandedPanelVisible.value = !expandedPanelVisible.value;
     return;
   }
 
@@ -291,140 +608,237 @@ watch(
     activeIndex.value = versionToIndex(version);
   },
 );
+
+watch(
+  () => [props.image, props.isRotated] as const,
+  () => {
+    updateModalSize();
+  },
+);
+
+onMounted(() => {
+  updateModalSize();
+  globalThis.window.addEventListener("resize", handleViewportResize);
+  globalThis.screen.orientation?.addEventListener("change", handleScreenRotation);
+});
+
+onBeforeUnmount(() => {
+  if (resizeTimer.value !== null) {
+    globalThis.clearTimeout(resizeTimer.value);
+  }
+
+  globalThis.window.removeEventListener("resize", handleViewportResize);
+  globalThis.screen.orientation?.removeEventListener(
+    "change",
+    handleScreenRotation,
+  );
+});
 </script>
 
 <style scoped>
 .modal-viewer {
-  background: rgba(0, 0, 0, 0.88);
-  border-radius: 8px;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.26);
   color: #f5f5f5;
   display: grid;
-  gap: 16px;
-  grid-template-columns: minmax(0, 1fr) minmax(220px, 320px);
-  inset: 56px 16px 24px;
-  padding: 16px;
+  inset: 0;
+  justify-items: center;
+  /* No padding: calculateModalSize already reserves the viewport margin
+     (width <= clientWidth - 100). Centering happens against the full viewport,
+     matching the legacy v-dialog — padding would shift the wider rotated stage. */
+  overflow: hidden;
+  padding: 0;
   position: fixed;
-  z-index: 1000;
+  z-index: 2400;
 }
 
 .viewer-stage {
   align-items: center;
+  background: transparent;
   display: grid;
+  height: var(--modal-height);
   justify-items: center;
-  min-width: 0;
+  /* Replicates Vuetify v-dialog's default max-width (24px margin each side),
+     which clamps the rotated modal on the narrowest viewports. */
+  max-width: calc(100vw - 48px);
+  overflow: visible;
   position: relative;
+  width: var(--modal-width);
 }
 
 .viewer-stage img {
-  max-height: min(var(--modal-image-height), calc(100vh - 128px));
-  max-width: min(var(--modal-image-width), 100%);
-  object-fit: contain;
-}
-
-.close-button {
-  background: rgba(255, 255, 255, 0.14);
-  border: 0;
-  border-radius: 999px;
-  color: #fff;
-  cursor: pointer;
-  font-size: 1.25rem;
-  height: 32px;
+  border-radius: 4px;
+  display: block;
+  /* Absolute fill so height resolves against the stage box even when max-width
+     clamps it (rotated modal on narrow viewports), matching the legacy cover. */
+  height: 100%;
+  inset: 0;
+  object-fit: cover;
   position: absolute;
-  right: 0;
+  width: 100%;
+}
+
+.viewer-stage.rotated {
+  transform: rotate(90deg);
+  transform-origin: center center;
+}
+
+.no-edit-checkbox {
+  position: absolute;
   top: 0;
-  width: 32px;
+  right: 0;
 }
 
-.version-controls {
+.custom-delimiters {
+  position: absolute;
+  top: 7px;
+  left: 0;
+  margin: 4px;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.expansion-panel {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+}
+
+.expansion-box {
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #c5c5c5;
+}
+
+.expansion-title {
+  max-height: 30px;
+}
+
+.arrow-expand-panel {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.expand-button {
+  color: white;
+  background-color: black;
+}
+
+.card-pallete-colors {
+  background-color: transparent;
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
   justify-content: center;
-  margin-top: 12px;
+  align-items: center;
 }
 
-.version-controls button,
-.palette-color {
+.color-palette {
+  display: flex;
+  margin: 0;
+}
+
+.color-box {
+  width: 25px;
+  height: 25px;
+  border: none;
   cursor: pointer;
 }
 
-.version-controls button {
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 999px;
-  color: #fff;
-  min-height: 30px;
-  padding: 0 12px;
+.card-description-tags {
+  background-color: rgba(0, 0, 0, 0.7);
+  color: #c5c5c5;
 }
 
-.version-controls .active {
-  background: rgb(var(--v-theme-primary));
-  color: rgb(var(--v-theme-on-primary));
+.non-clickable {
+  pointer-events: none;
 }
 
-.viewer-details {
-  display: grid;
-  gap: 12px;
-  overflow: auto;
+.v-tab.v-tab.v-btn {
+  min-width: 50px;
 }
 
-.location {
-  font-weight: 700;
-  margin: 0;
+:deep(.v-slide-group__container) {
+  display: ruby;
+  text-align: center;
 }
 
-.location-links,
-.tags,
-.palette {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+.v-expansion-panel--active
+  > .v-expansion-panel-title:not(.v-expansion-panel-title--static) {
+  min-height: 40px;
 }
 
-.location-links a {
-  color: rgb(var(--v-theme-secondary));
+:deep(.v-expansion-panel-text__wrapper) {
+  padding: 0 !important;
+  overflow-y: auto;
 }
 
-.metadata {
-  display: grid;
-  gap: 8px;
-  margin: 0;
+.location-button,
+.datetime-button {
+  color: white;
+  background-color: rgba(0, 0, 0, 0.4);
+  overflow: hidden;
 }
 
-.metadata div {
-  display: grid;
-  grid-template-columns: 92px minmax(0, 1fr);
+.location-menu,
+.datetime-menu {
+  color: #c5c5c5;
 }
 
-.metadata dt {
-  color: rgba(255, 255, 255, 0.64);
+.location-full {
+  font-size: 14px;
+  color: #c5c5c5;
+  font-weight: bold;
+  text-align: center;
 }
 
-.metadata dd {
-  margin: 0;
-  overflow-wrap: anywhere;
+.datetime-photographed {
+  margin-left: 0;
 }
 
-.description {
-  margin: 0;
+.div-location-button {
+  max-width: 100%;
 }
 
-.palette-color {
-  border: 1px solid rgba(255, 255, 255, 0.24);
-  height: 28px;
-  width: 28px;
+.scroll-container {
+  overflow: hidden;
+  white-space: nowrap;
+  width: 100%;
+  display: inline-block;
+  position: relative;
 }
 
-.tags span {
-  background: rgba(255, 255, 255, 0.12);
-  border-radius: 999px;
-  padding: 4px 10px;
+.scroll-text {
+  display: inline-block;
+  white-space: nowrap;
+  animation: scroll 10s linear infinite;
 }
 
-@media (max-width: 760px) {
-  .modal-viewer {
-    grid-template-columns: 1fr;
-    overflow: auto;
+.scroll-text::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 100%;
+  white-space: nowrap;
+}
+
+.text-specs-description-tags::-webkit-scrollbar {
+  width: 12px;
+}
+
+.text-specs-description-tags::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.9);
+  border-radius: 6px;
+}
+
+.text-specs-description-tags::-webkit-scrollbar-track {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateX(0%);
+  }
+
+  100% {
+    transform: translateX(-100%);
   }
 }
 </style>

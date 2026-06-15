@@ -102,10 +102,24 @@ describe("ModalViewerImage", () => {
         writeText: vi.fn().mockResolvedValue(undefined),
       },
     });
+    // Vuetify overlays (v-menu) read visualViewport, absent in jsdom.
+    Object.defineProperty(globalThis.window, "visualViewport", {
+      configurable: true,
+      value: {
+        addEventListener: vi.fn(),
+        height: 768,
+        offsetLeft: 0,
+        offsetTop: 0,
+        removeEventListener: vi.fn(),
+        scale: 1,
+        width: 1024,
+      },
+    });
   });
 
-  it("renders the requested version with EXIF, palette and location links", async () => {
+  it("reveals the requested version EXIF, palette and location links", async () => {
     const component = await mountSuspended(ModalViewerImage, {
+      attachTo: document.body,
       props: {
         image: makeImage(),
         isRotated: false,
@@ -116,20 +130,33 @@ describe("ModalViewerImage", () => {
     expect(component.get("[data-testid='modal-image']").attributes("src")).toBe(
       "https://cdn.test/v2-optimized.jpg",
     );
-    expect(component.text()).toContain("Cool");
+
+    // The info chrome mirrors the legacy modal: hidden until hover, then the
+    // EXIF/palette panel is revealed by expanding the title.
+    await component.get("[data-testid='viewer-stage']").trigger("mouseover");
+    await component.get(".expansion-title").trigger("click");
+
     expect(component.text()).toContain("X-T5");
     expect(component.text()).toContain("23mm");
-    expect(component.text()).toContain("Temple");
-    expect(component.get("[data-testid='maps-link']").attributes("href")).toBe(
-      "https://www.google.com/maps?q=35.7148,139.7967",
-    );
-    expect(
-      component.get("[data-testid='street-view-link']").attributes("href"),
-    ).toContain("viewpoint=35.7148,139.7967");
 
     await component.get("[data-testid='palette-color-0']").trigger("click");
-
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith("#46505a");
+
+    // Opening the location menu exposes the Maps/Street View deep-links.
+    await component.get(".location-button").trigger("click");
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    const mapsLink = document.body.querySelector("[data-testid='maps-link']");
+    const streetViewLink = document.body.querySelector(
+      "[data-testid='street-view-link']",
+    );
+
+    expect(mapsLink?.getAttribute("href")).toBe(
+      "https://www.google.com/maps?q=35.7148,139.7967",
+    );
+    expect(streetViewLink?.getAttribute("href")).toContain(
+      "viewpoint=35.7148,139.7967",
+    );
   });
 
   it("opens from a gallery deep-link using the requested version", async () => {
@@ -142,6 +169,20 @@ describe("ModalViewerImage", () => {
     expect(component.find("[data-testid='modal-viewer']").exists()).toBe(true);
     expect(component.get("[data-testid='modal-image']").attributes("src")).toBe(
       "https://cdn.test/v2-optimized.jpg",
+    );
+  });
+
+  it("rotates the modal from the gallery chrome", async () => {
+    api.listImages.mockResolvedValue({ images: [makeImage()], total: 1 });
+
+    const component = await mountSuspended(App, {
+      route: "/gallery?all=true&id=img-1&version=1",
+    });
+
+    await component.get("[data-testid='rotate-image']").trigger("click");
+
+    expect(component.get("[data-testid='viewer-stage']").classes()).toContain(
+      "rotated",
     );
   });
 });
