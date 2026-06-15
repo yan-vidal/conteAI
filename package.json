@@ -15,6 +15,7 @@
     "test:legacy-resize": "vitest run tests/legacy-resize",
     "visual:legacy": "playwright test -c playwright.legacy.config.ts",
     "visual:legacy:update": "playwright test -c playwright.legacy.config.ts --update-snapshots",
+    "visual:web": "playwright test -c playwright.web.config.ts",
     "build": "pnpm -r --if-present build"
   },
   "devDependencies": {
