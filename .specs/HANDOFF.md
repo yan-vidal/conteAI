@@ -1,9 +1,9 @@
 # Handoff
 
-**Date:** 2026-06-14
+**Date:** 2026-06-15
 **Repository:** `https://github.com/yan-vidal/conteAI`
-**Branch atual:** `f3-web-nuxt` (criada a partir de `main` após o merge do PR #1)
-**Feature em andamento:** F3 — Frontend Nuxt + Favoritas (`.specs/features/03-web-nuxt-favoritas/`)
+**Branch atual:** `f3-web-nuxt` (criada a partir de `main` após o merge do PR #1) — **F3 completa, pronta para PR**
+**Feature concluída:** F3 — Frontend Nuxt + Favoritas (`.specs/features/03-web-nuxt-favoritas/`)
 
 ## Completed ✓
 
@@ -19,6 +19,7 @@
 - **F3 P6 — ModalViewerImage**: modal abre por `/gallery?id=&version=`, renderiza versão correta, alterna original/versões, usa `calculateModalSize`, mostra EXIF/tags/paleta copy-hex, links Maps/Street View e navegação por teclado/swipe. 16 testes web verdes, lint/typecheck/build web verdes sob Node 26, Sentiness fast `ok`.
 - **F3 P8 — Upload**: `/upload` client-only protegido com multi-arquivo, `versionNames[index]`, Original exclusivo, Favorita marcada por padrão, descrição, `useApi().uploadImage(FormData)` e feedback de sucesso/erro. 18 testes web verdes, lint/typecheck/build web verdes sob Node 26, Sentiness fast `ok`.
 - **F3 P9 — List/Edit**: `/list` client-only protegido lista imagens admin, alterna favorita na linha, edita descrição/local/tags/favorita + `metadata.takenAt` + URLs de original/versões e exclui com confirmação. 20 testes web verdes, lint/typecheck/build web verdes sob Node 26, Sentiness fast `ok`.
+- **F3 P10 — Regressão visual + paridade** (commits `6d4d19c`..`86799f0`): suíte `tests/visual/webPort.spec.ts` (`playwright.web.config.ts`, app novo na porta 3003, 6 viewports) compara o Nuxt contra os goldens do legado — **66/66 verdes**. O chrome do modal foi **portado fielmente com Vuetify** (não mascarado): `ModalViewerImage.vue` reconstruído com `v-expansion-panels`/`v-radio-group`/`v-menu`, 12 ícones SVG em `components/icons/`, formatador de data em `utils/date.ts`. Geometria da foto corrigida (sem padding no `.modal-viewer`, resize síncrono na rotação, clamp `max-width: calc(100vw-48px)`, `img` absoluta). Thresholds calibrados por diff consciente: galeria 0.04 (sub-pixel do `<img>` vs `v-img`), chrome 0.05 (padding/sombra do Vuetify — RV5). Goldens de login/redirect recapturados para o design pt-BR "Secret Door"; golden mobile-landscape do modal substituído (era artefato de loading do legado). Vitest 21/21, lint/typecheck verdes, Sentiness standard `ok`. Ver memória `modal-chrome-parity`.
 
 ## Decisões de execução da F3 (adotadas das sugestões da spec)
 
@@ -27,9 +28,12 @@
 
 ## Next Step
 
-**Retomar a F3 na tarefa P10** (ver `tasks.md`): regressão visual contra os goldens da Fase 0, revisão dos diffs, Sentiness slow/aceitação e handoff para F4.
+**F3 está completa (P1–P10).** Próximos passos:
 
-- **P10** regressão visual vs goldens + Vitest + aceitação.
+1. **Abrir PR de `f3-web-nuxt` → `main`** (a branch ainda não tem PR). Escrever a aceitação da F3 em `.specs/features/03-web-nuxt-favoritas/acceptance.md` (espelhar o formato de `02-api-nest-port/acceptance.md`).
+2. **Iniciar a F4** (próxima feature da spec — confirmar o escopo em `.specs/project/` / roadmap antes de criar o breakdown em `.specs/features/04-*/tasks.md`).
+
+Pendências não-bloqueantes deixadas para decisão do Yan: (a) localizar ou não o heading "Secret Door" hardcoded; (b) manter o redesign de login ou reaproximar do legado.
 
 Ler primeiro: `.specs/features/03-web-nuxt-favoritas/spec.md` e a seção P1–P10 de `tasks.md`. Front legado de referência em `yan-site-front-vue/src/` (GalleryView, ModalViewerImage, ModalEditImage, UploadImages, LoginView; store Vuex; `plugins/api.js`).
 
@@ -39,7 +43,8 @@ Ler primeiro: `.specs/features/03-web-nuxt-favoritas/spec.md` e a seção P1–P
 - Web: stores Pinia em **sintaxe setup** (evita warning de auto-import); ambiente de teste vitest = `nuxt` (`mockNuxtImport` + `setActivePinia(createPinia())`).
 - **API nova roda como backend do front novo** (`NUXT_PUBLIC_API_URL`).
 - **Sentiness baseline** reinicializado na F2 (suprime falsos-positivos pré-existentes do knip). Nunca editar baseline/config para silenciar achados NOVOS. Issue de dogfooding: https://github.com/Arateki/Sentiness/issues/7.
-- Uncommitted: nenhum (verificar `git status`). Branch `f3-web-nuxt` ainda não tem PR.
+- Uncommitted: nenhum (verificar `git status`). Branch `f3-web-nuxt` com toda a F3 commitada (até `86799f0`), ainda **sem PR**.
+- Regressão visual do app novo: `pnpm visual:web` (`playwright.web.config.ts`, porta 3003). `playwright.config.ts` agora aponta para a config do web; legado continua em `playwright.legacy.config.ts` (`pnpm visual:legacy`).
 
 ## Invariants (não quebrar)
 
