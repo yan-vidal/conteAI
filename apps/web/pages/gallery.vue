@@ -150,6 +150,11 @@
           type="button"
           @click="openImage(image)"
         >
+          <span
+            aria-hidden="true"
+            class="thumb-placeholder"
+            :style="lazyThumbnailStyle(image)"
+          />
           <img
             :alt="imageAlt(image)"
             loading="lazy"
@@ -487,6 +492,18 @@ if (idOpen.value) {
 const thumbnailUrl = (image: ImageDocument): string =>
   image.images[0]?.thumbnailUrl ?? image.original.thumbnailUrl;
 
+// The low-resolution base64 placeholder shown blurred while the real thumbnail
+// loads, mirroring the legacy v-img lazy-src blur-up. Kept as a plain <img> so
+// the gallery stays SSR-visible (v-img only renders client-side).
+const lazyThumbnailStyle = (
+  image: ImageDocument,
+): Record<string, string> => {
+  const lazy =
+    image.images[0]?.lazyThumbnailBase64 ?? image.original.lazyThumbnailBase64;
+
+  return { "--lazy-thumb": lazy ? `url("${lazy}")` : "none" };
+};
+
 const imageAlt = (image: ImageDocument): string =>
   image.description || [image.city, image.state, image.country].filter(Boolean).join(", ");
 
@@ -823,8 +840,30 @@ h1 {
   display: block;
   font: inherit;
   padding: 0;
+  position: relative;
   text-align: left;
   width: 100%;
+}
+
+/* Blurred low-res placeholder behind the thumbnail (legacy blur-up). The inset
+   negative offset + overflow clip keep the blur bleed within the rounded box. */
+.thumb-placeholder {
+  border-radius: 8px;
+  inset: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: 0;
+}
+
+.thumb-placeholder::before {
+  aspect-ratio: 1;
+  background-image: var(--lazy-thumb);
+  background-position: center;
+  background-size: cover;
+  content: "";
+  filter: blur(12px);
+  inset: -8%;
+  position: absolute;
 }
 
 .image-button img {
@@ -833,8 +872,10 @@ h1 {
   box-shadow: 4px 10px 5px rgba(0, 0, 0, 0.4);
   display: block;
   object-fit: cover;
+  position: relative;
   transition: filter 0.3s ease-in-out, transform 0.3s ease-in-out;
   width: 100%;
+  z-index: 1;
 }
 
 .image-button:hover img {

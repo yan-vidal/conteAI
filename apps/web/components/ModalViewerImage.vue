@@ -16,6 +16,11 @@
       @touchend="handleTouchEnd"
       @touchstart="handleTouchStart"
     >
+      <span
+        aria-hidden="true"
+        class="viewer-placeholder"
+        :style="placeholderStyle"
+      />
       <img
         :alt="imageAlt"
         data-testid="modal-image"
@@ -414,6 +419,15 @@ const activeVersion = computed<ImageVersion>(() =>
     : props.image.images[activeIndex.value] ?? props.image.original,
 );
 
+// Blurred base64 placeholder shown behind the pixel-faithful <img> while the
+// full photo loads (legacy blur-up). The photo stays opaque and covers it once
+// it paints, so the loaded golden is unchanged and there is no JS load race.
+const placeholderStyle = computed(() => ({
+  "--lazy-thumb": activeVersion.value.lazyThumbnailBase64
+    ? `url("${activeVersion.value.lazyThumbnailBase64}")`
+    : "none",
+}));
+
 const imageAlt = computed(
   () =>
     props.image.description ||
@@ -676,6 +690,26 @@ onBeforeUnmount(() => {
   object-fit: cover;
   position: absolute;
   width: 100%;
+  z-index: 1;
+}
+
+/* Blurred low-res placeholder behind the photo (legacy blur-up). */
+.viewer-placeholder {
+  border-radius: 4px;
+  inset: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: 0;
+}
+
+.viewer-placeholder::before {
+  background-image: var(--lazy-thumb);
+  background-position: center;
+  background-size: cover;
+  content: "";
+  filter: blur(16px);
+  inset: -6%;
+  position: absolute;
 }
 
 .viewer-stage.rotated {
