@@ -175,4 +175,29 @@ describe("gallery page", () => {
     });
     expect(component.text()).toContain("Photo plain-2");
   });
+
+  it("enters and exits theater mode from the gallery", async () => {
+    api.listImages.mockResolvedValue({
+      images: [makeImage("theater-1", false)],
+      total: 1,
+    });
+
+    const component = await mountSuspended(App, { route: "/gallery?all=true" });
+
+    expect(component.find("[data-testid='theater-mode']").exists()).toBe(false);
+
+    await component.get("[data-testid='enter-theater']").trigger("click");
+    await flushPromises();
+
+    const theater = component.find("[data-testid='theater-mode']");
+    expect(theater.exists()).toBe(true);
+    expect(theater.get("[data-testid='theater-image']").attributes("src")).toBe(
+      "https://cdn.test/theater-1-optimized.jpg",
+    );
+
+    await component.get("[data-testid='theater-exit']").trigger("click");
+    await flushPromises();
+
+    expect(component.find("[data-testid='theater-mode']").exists()).toBe(false);
+  });
 });

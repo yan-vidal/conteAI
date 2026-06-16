@@ -62,6 +62,10 @@
     "password": "Senha",
     "submit": "Entrar"
   },
+  "theater": {
+    "enter": "Modo teatro",
+    "exit": "Sair do modo teatro"
+  },
   "upload": {
     "addVersion": "Adicionar versão",
     "description": "Descrição",
