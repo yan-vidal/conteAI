@@ -28,6 +28,13 @@
 
 ## Next Step
 
+> ⚠️ **Regressões de paridade encontradas no teste manual (2026-06-15):** o front
+> novo diverge do legado em 6 interações (date picker da galeria, menus de
+> localização/data do modal, visibilidade do chrome do modal, toggle de tema,
+> posição dos botões de nav/rotação, scrollbar do modo teatro). Tudo documentado
+> com referências de código e metodologia golden-driven em
+> [`HANDOFF-parity-fixes.md`](./HANDOFF-parity-fixes.md). **Ler antes de continuar.**
+
 **F3 está completa (P1–P10).** Próximos passos:
 
 1. **Abrir PR de `f3-web-nuxt` → `main`** (a branch ainda não tem PR). Escrever a aceitação da F3 em `.specs/features/03-web-nuxt-favoritas/acceptance.md` (espelhar o formato de `02-api-nest-port/acceptance.md`).
