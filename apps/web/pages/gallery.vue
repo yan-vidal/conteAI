@@ -96,6 +96,17 @@
       </v-icon>
     </div>
 
+    <v-btn
+      v-if="!selectedImage && !theaterActive"
+      :aria-label="$t('theater.enter')"
+      class="theater-enter"
+      color="primary"
+      data-testid="enter-theater"
+      icon="mdi-play-circle-outline"
+      size="large"
+      @click="enterTheater"
+    />
+
     <dl
       class="query-preview"
       aria-label="Gallery deep-link query"
@@ -279,6 +290,12 @@
         @click="changeImage(1)"
       />
     </div>
+
+    <TheaterMode
+      v-if="theaterActive"
+      :items="theaterItems"
+      @exit="exitTheater"
+    />
   </v-container>
 </template>
 
@@ -302,6 +319,7 @@ import {
 import { useTheme as useVuetifyTheme } from "vuetify";
 import { useAsyncData, useRoute, useRouter } from "#imports";
 import ModalViewerImage from "../components/ModalViewerImage.vue";
+import TheaterMode from "../components/TheaterMode.vue";
 import { type GalleryQuery, useApi } from "../composables/useApi.js";
 import { useThemeStore } from "../stores/theme.js";
 
@@ -367,6 +385,8 @@ const loadingMore = ref(false);
 const errorMessage = ref("");
 const selectedImage = ref<ImageDocument | null>(null);
 const isRotated = ref(false);
+const theaterActive = ref(toQueryText(route.query.theater) === "true");
+const theaterFallbackItems = ref<ImageDocument[]>([]);
 
 const { data: filterData } = await useAsyncData<FilterData>(
   "gallery-filters",
@@ -573,6 +593,55 @@ const closeImage = async (): Promise<void> => {
   await replaceRouteQuery();
 };
 
+// Theater mode reuses the active filter's photos; if that result is empty it
+// falls back to the full archive (R2). The gallery stays mounted underneath, so
+// leaving the mode restores its exact state for free (AC4).
+const theaterItems = computed<ImageDocument[]>(() =>
+  items.value.length > 0 ? items.value : theaterFallbackItems.value,
+);
+
+const enterTheater = async (): Promise<void> => {
+  // Request fullscreen synchronously inside the click gesture; browsers reject
+  // it from a later microtask. The overlay still shows if it is denied.
+  const root = globalThis.document?.documentElement;
+  if (root?.requestFullscreen) {
+    void root.requestFullscreen().catch(() => {});
+  }
+
+  if (items.value.length === 0 && theaterFallbackItems.value.length === 0) {
+    const response = await fetchImages(0, true);
+    theaterFallbackItems.value = response.images;
+  }
+
+  // Show the overlay immediately; the route watch keeps it in sync for
+  // back/forward and deep-links.
+  theaterActive.value = true;
+  await router.push({
+    path: "/gallery",
+    query: { ...buildRouteQuery(), theater: "true" },
+  });
+};
+
+const exitTheater = async (): Promise<void> => {
+  if (!theaterActive.value) {
+    return;
+  }
+
+  // Hide immediately so re-entrant fullscreenchange/exit calls are idempotent.
+  theaterActive.value = false;
+  if (globalThis.document?.fullscreenElement) {
+    await globalThis.document.exitFullscreen?.();
+  }
+  await router.replace({ path: "/gallery", query: buildRouteQuery() });
+};
+
+const handleFullscreenChange = (): void => {
+  // Esc leaves fullscreen without changing the route; mirror it into an exit.
+  if (!globalThis.document?.fullscreenElement && theaterActive.value) {
+    void exitTheater();
+  }
+};
+
 const toggleRotation = (): void => {
   isRotated.value = !isRotated.value;
 };
@@ -682,6 +751,11 @@ const fillToViewport = async (): Promise<void> => {
 };
 
 onMounted(async () => {
+  globalThis.document?.addEventListener(
+    "fullscreenchange",
+    handleFullscreenChange,
+  );
+
   await nextTick();
   await fillToViewport();
 
@@ -701,7 +775,22 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   scrollObserver?.disconnect();
+  globalThis.document?.removeEventListener(
+    "fullscreenchange",
+    handleFullscreenChange,
+  );
 });
+
+// Back/forward navigation toggles the theater overlay via the URL (R1, R7).
+watch(
+  () => route.query.theater,
+  (value) => {
+    theaterActive.value = value === "true";
+    if (!theaterActive.value && globalThis.document?.fullscreenElement) {
+      void globalThis.document.exitFullscreen?.();
+    }
+  },
+);
 
 watch(
   [selectedCountries, selectedStates, selectedCities, selectedTags],
@@ -826,6 +915,13 @@ h1 {
   .image-grid {
     grid-template-columns: repeat(12, minmax(0, 1fr));
   }
+}
+
+.theater-enter {
+  bottom: 24px;
+  position: fixed;
+  right: 24px;
+  z-index: 5;
 }
 
 .image-tile {

@@ -13,7 +13,7 @@ Convenções (de F3): componente em `apps/web/components`, página é `apps/web/
 **Reusa:** estado/filtros de `gallery.vue`, `useApi`, store de tema/locale.
 **Done when:** `/gallery?theater=true` entra em fullscreen exibindo só as fotos do filtro; Esc e back restauram a galeria sem perda de estado.
 **Commit:** `feat(web): theater mode entry, url state and lifecycle`
-- [ ] pendente
+- [x] concluída em 2026-06-15. `TheaterMode.vue` (overlay fullscreen, exibe a 1ª foto do filtro — slideshow é a T4) + integração em `gallery.vue`: FAB `enter-theater` (oculto com modal/teatro aberto), `enterTheater` pede Fullscreen API dentro do gesto + `theater=true` na URL, `exitTheater` sai do fullscreen e remove o param, watch de `route.query.theater` p/ back/forward, `fullscreenchange` mapeia Esc → saída; fallback p/ todas quando o filtro é vazio (R2); galeria permanece montada por baixo (restauração grátis, AC4). Botão é elemento novo → mascarado nos 3 estados de galeria do `webPort.spec.ts` (RV5). i18n `theater.{enter,exit}`. Verificado: `pnpm --filter web test` (22), `lint`, `typecheck`, visual desktop 11/11, Sentiness fast `ok`.
 
 ## T2 — Screen Wake Lock (R6, AC3)
 **O que:** adquirir `globalThis.navigator.wakeLock.request("screen")` ao entrar no teatro; reativar em `visibilitychange` ao voltar do background; liberar ao sair. Degradar graciosamente onde a API não existe (sem erro).

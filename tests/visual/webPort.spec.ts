@@ -36,28 +36,28 @@ test.describe("web port visual comparison", () => {
   test("gallery default dark", async ({ page }) => {
     await openGallery(page, routes.defaultGallery, "dark");
 
-    await expect(page).toHaveScreenshot(
-      "gallery-default-dark.png",
-      GALLERY_SNAPSHOT,
-    );
+    await expect(page).toHaveScreenshot("gallery-default-dark.png", {
+      ...GALLERY_SNAPSHOT,
+      mask: [page.getByTestId("enter-theater")],
+    });
   });
 
   test("gallery default light", async ({ page }) => {
     await openGallery(page, routes.defaultGallery, "light");
 
-    await expect(page).toHaveScreenshot(
-      "gallery-default-light.png",
-      GALLERY_SNAPSHOT,
-    );
+    await expect(page).toHaveScreenshot("gallery-default-light.png", {
+      ...GALLERY_SNAPSHOT,
+      mask: [page.getByTestId("enter-theater")],
+    });
   });
 
   test("gallery filtered", async ({ page }) => {
     await openGallery(page, routes.japanTemple, "dark");
 
-    await expect(page).toHaveScreenshot(
-      "gallery-filtered-japan-temple.png",
-      GALLERY_SNAPSHOT,
-    );
+    await expect(page).toHaveScreenshot("gallery-filtered-japan-temple.png", {
+      ...GALLERY_SNAPSHOT,
+      mask: [page.getByTestId("enter-theater")],
+    });
   });
 
   test("modal landscape", async ({ page }) => {
