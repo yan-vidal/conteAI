@@ -53,6 +53,7 @@ export interface ImageDocument extends TimestampedDocument {
   images: ImageVersion[];
   original: ImageVersion;
   metadata: ImageMetadata;
+  favorite?: boolean;
 }
 
 export interface Tag extends TimestampedDocument {

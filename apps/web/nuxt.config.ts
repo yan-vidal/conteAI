@@ -3,10 +3,18 @@ import { defineNuxtConfig } from "nuxt/config";
 export default defineNuxtConfig({
   ssr: true,
   compatibilityDate: "2026-06-11",
+  devtools: {
+    enabled: process.env.NUXT_DEVTOOLS !== "false",
+  },
   devServer: {
     port: 3001,
   },
-  modules: ["vuetify-nuxt-module", "@pinia/nuxt", "@nuxtjs/i18n"],
+  modules: [
+    "vuetify-nuxt-module",
+    "@pinia/nuxt",
+    "@pinia-plugin-persistedstate/nuxt",
+    "@nuxtjs/i18n",
+  ],
   css: ["@mdi/font/css/materialdesignicons.css"],
   runtimeConfig: {
     public: {

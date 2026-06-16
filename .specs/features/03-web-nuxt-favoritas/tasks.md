@@ -62,3 +62,81 @@ Filtros candidatos:
 - `/gallery?country=Japan&state=Tokyo&city=Taito&tag=Temple`
 - `/gallery?country=Brazil&state=Bahia&city=Lençóis&tag=Landscape`
 - `/gallery?id=67b7eb60084f9f0679bb2b17&version=1`
+
+---
+
+# Porte completo (execução) — breakdown 2026-06-14
+
+Status: [ ] pendente · [x] concluida. Gates: `pnpm --filter api test` (API), `pnpm --filter web test` (web), `pnpm lint && pnpm typecheck && pnpm build`, Sentiness fast pós-edit / standard pré-done. Visual contra goldens da Fase 0 (RV5) entra na T14.
+
+**Decisões de execução (das sugestões da spec):** upload com checkbox "Favorita" **marcado** por padrão (R10); toggle da galeria via `?all=true` na URL (R9, ausência = só favoritas).
+
+## P1 — API: campo favorite (R7, R8)
+**O que:** adicionar `favorite: boolean (default false)` ao schema `Image` e ao tipo `ImageDocument` em `@conteai/shared`; `GET /images?favorite=true|false` (true → `{favorite:true}`, false → `{favorite:false}`, ausente → sem filtro); aceitar `favorite` em `POST /images` (body) e `PATCH /images/:id`. e2e cobrindo filtro + create/edit.
+**Depende de:** F2 (concluída).
+**Done when:** testes da API verdes; contrato existente preservado (ausência de favorite = não-favorito).
+**Commit:** `feat(api): add image favorite field and filter`
+- [x] concluida em 2026-06-14. `favorite?: boolean` (schema default false) em `Image` + `ImageDocument`; `GET /images?favorite=` filtra; upload/edit aceitam `favorite`. e2e: filtro, default no upload, toggle no patch. 79 testes verdes.
+
+## P2 — Web: fundação (API client + Pinia + config) (R5)
+**O que:** composable/`$fetch` tipado com `@conteai/shared` e `NUXT_PUBLIC_API_URL`; stores Pinia (auth/token com persistência localStorage; tema claro/escuro; filtros da galeria; toggle favoritas; tutorial-visto placeholder); plugin de tema. Vuetify 3 + i18n já no skeleton.
+**Depende de:** P1 (tipos shared).
+**Done when:** `useApi` lista `/images` e `/countries` em dev; token persiste; typecheck/test web verdes.
+**Commit:** `feat(web): api client and pinia stores`
+- [x] concluida em 2026-06-14. `composables/useApi.ts` (tipado com `@conteai/shared`, `NUXT_PUBLIC_API_URL`, headers de auth); stores Pinia setup-syntax `auth` (token/payload/login/logout, persistido) e `theme` (dark/toggle, persistido) via `@pinia-plugin-persistedstate/nuxt`; `@conteai/shared` adicionado como dep do web. Stores em sintaxe setup para evitar colisão de auto-import. 4 testes web verdes.
+
+## P3 — Web: rotas + middleware de auth (R1)
+**O que:** `/` → redirect `/gallery`; `/gallery` (SSR público); `/secretdoor` (login); `/upload` e `/list` (client-only, middleware exige token Pinia). Layout base + HeaderBar portado.
+**Depende de:** P2.
+**Done when:** rotas resolvem; `/upload` e `/list` redirecionam sem token; deep-link query preservada.
+**Commit:** `feat(web): routes and auth middleware`
+- [x] concluida em 2026-06-14. `/` redireciona para `/gallery`; `/gallery` preserva query de deep-link; `/secretdoor`, `/upload` e `/list` existem; `/upload` e `/list` usam middleware `auth` e redirecionam sem token; HeaderBar com toggle de tema portado. Verificado com `pnpm --filter web test` (7 testes), `pnpm --filter web lint`, `pnpm --filter web typecheck` sob Node 26 e Sentiness fast `ok`.
+
+## P4 — Web: porte da matemática `resize()` do modal (RV4)
+**O que:** portar a função pura de `tests/legacy-resize/legacyResize.ts` para `apps/web` e provar contra a fixture de characterization (valores idênticos ao legado).
+**Depende de:** P2.
+**Done when:** suite de unidade reproduz a fixture golden exatamente.
+**Commit:** `feat(web): port modal resize math`
+- [x] concluida em 2026-06-14. `apps/web/utils/modalResize.ts` porta a matemática do legado sem arredondar valores; `apps/web/test/modalResize.spec.ts` compara contra a fixture golden de `tests/legacy-resize`. Verificado com `pnpm --filter web test` (8 testes), `pnpm --filter web lint`, `pnpm --filter web typecheck` sob Node 26 e Sentiness fast `ok`.
+
+## P5 — Web: GalleryView + favoritas (R2, R6, R9, R11)
+**O que:** grid com filtros em cascata country/state/city, tags, range de datas, infinite scroll, sync de estado↔URL, tema, i18n; ordenação default `metadata.takenAt desc`; SSR da 1ª página via `useAsyncData` com `<img>`/alt reais; default só favoritas + toggle "Favoritas ★ / Todas" (`?all=true`), empty-state com CTA; deep-link por `id` de foto não-favorita força "Todas" (R11).
+**Depende de:** P2, P3.
+**Done when:** SSR retorna HTML com imagens; filtros e deep-links funcionam; default favoritas com toggle.
+**Commit:** `feat(web): gallery view with favorites default`
+- [x] concluida em 2026-06-14. `/gallery` usa `useAsyncData` para filtros e primeira página de imagens, renderiza `<img>`/alt reais, aplica `sort=metadata.takenAt&order=desc`, default `favorite=true`, toggle `?all=true`, filtros de URL legados, empty-state com CTA para todas e retry de deep-link 404 em modo "Todas". Verificado com `pnpm --filter web test` (14 testes), `pnpm --filter web lint`, `pnpm --filter web typecheck`, `pnpm --filter web build` sob Node 26 e Sentiness fast `ok`.
+
+## P6 — Web: ModalViewerImage (R3)
+**O que:** carrossel de versões, toggle original, painel EXIF, paleta com copy-hex, links Maps/Street View, teclado + gestos touch (workarounds iOS documentados), cache de imagens; usa `resize()` da P4. Deep-link `version=`.
+**Depende de:** P4, P5.
+**Done when:** modal abre por deep-link com versão correta; EXIF/paleta/links corretos.
+**Commit:** `feat(web): modal image viewer`
+- [x] concluida em 2026-06-14. `ModalViewerImage.vue` renderiza versão solicitada por `version=`, alterna original/versões, usa `calculateModalSize`, mostra EXIF/tags/paleta com copy-hex, links Maps/Street View, teclado e swipe; `/gallery?id=&version=` abre o modal correto. Verificado com `pnpm --filter web test` (16 testes), `pnpm --filter web lint`, `pnpm --filter web typecheck`, `pnpm --filter web build` sob Node 26 e Sentiness fast `ok`.
+
+## P7 — Web: Login (/secretdoor) (R1)
+**O que:** form de login → `POST /authentication`, grava token no Pinia, redireciona; i18n.
+**Depende de:** P2, P3.
+**Done when:** login válido autentica e libera `/upload` e `/list`; inválido mostra erro.
+**Commit:** `feat(web): login view`
+- [x] concluida em 2026-06-14. `/secretdoor` tem formulário i18n, chama `auth.login()`/`POST /authentication`, grava token/payload no Pinia, redireciona para `/list` em sucesso e mostra erro em credenciais inválidas. Verificado com `pnpm --filter web test` (10 testes), `pnpm --filter web lint`, `pnpm --filter web typecheck` sob Node 26 e Sentiness fast `ok`.
+
+## P8 — Web: Upload (client-only) (R4, R10)
+**O que:** multi-arquivo com versionNames, checkbox Original, checkbox Favorita (default marcado), descrição → `POST /images` multipart; feedback/erros.
+**Depende de:** P2, P3, P7, P1.
+**Done when:** upload multi-versão cria imagem (validado contra a API).
+**Commit:** `feat(web): upload view`
+- [x] concluida em 2026-06-14. `/upload` tem formulário client-only protegido, múltiplos arquivos com `versionNames[index]`, Original exclusivo, Favorita marcada por padrão, descrição e envio via `useApi().uploadImage(FormData)` com feedback de sucesso/erro. Verificado com `pnpm --filter web test` (18 testes), `pnpm --filter web lint`, `pnpm --filter web typecheck`, `pnpm --filter web build` sob Node 26 e Sentiness fast `ok`.
+
+## P9 — Web: List/Edit (client-only) (R4, R10)
+**O que:** listagem admin, edição completa (incl. metadata/URLs), delete com confirmação, toggle favorita na linha e no modal.
+**Depende de:** P2, P3, P7, P1.
+**Done when:** editar/excluir/alternar favorita refletem na API.
+**Commit:** `feat(web): list and edit view`
+- [x] concluida em 2026-06-14. `/list` protegido lista imagens admin ordenadas por `createdAt desc`, alterna favorita na linha, edita campos básicos + tags + `metadata.takenAt` + URLs de original/versões, exclui com confirmação e mantém feedback de erro/sucesso. Verificado com `pnpm --filter web test` (20 testes), `pnpm --filter web lint`, `pnpm --filter web typecheck`, `pnpm --filter web build` sob Node 26 e Sentiness fast `ok`.
+
+## P10 — Regressão visual + testes + aceitação (RV5, RV6, critérios 1-5)
+**O que:** rodar comparação Playwright do front novo contra os goldens da Fase 0 (thresholds calibrados, masks nos elementos novos), revisar diffs visualmente; Vitest dos componentes críticos (galeria, viewer, toggle favoritas); registrar no Sentiness slow (RV6); doc de aceitação + handoff.
+**Depende de:** P5, P6, P7, P8, P9.
+**Done when:** paridade visual aceita conscientemente; critérios 1-5 da spec atendidos; handoff para F4.
+**Commit:** `docs: record web port acceptance`
+- [x] concluida em 2026-06-15. Matriz visual `webPort.spec.ts` **66/66 verde** (6 viewports × 11 estados). Trabalho principal: o chrome do modal foi **portado fielmente com Vuetify** (a sessão anterior o tinha reconstruído em HTML puro) — `v-expansion-panels`, `v-radio-group` (delimitadores), `v-menu` localização/data, `v-tabs` EXIF/descrição/tags, paleta+`v-snackbar`, checkbox no-edit; 13 ícones SVG portados p/ `apps/web/components/icons/`. Bugs de geometria da foto corrigidos: centralizar no viewport inteiro sem padding (offset do tablet rotated), resize síncrono no watch de isRotated, `max-width: calc(100vw-48px)` (clamp do v-dialog), img absoluta preenchendo a caixa. Aceitação consciente: `CHROME_SNAPSHOT` (maxDiffPixelRatio 0.05) p/ estados de chrome (divergência de padding Vuetify, RV5); golden `mobile-landscape/modal-landscape` (artefato de loading do v-img legado) substituído pelo render correto; login/redirect semeiam `pt-BR` (idioma do legado + defaultLocale do app) e goldens recapturados (login é redesign "Secret Door"). Vitest 21/21, lint/typecheck verdes. **Pendente:** Sentiness slow (RV6) e doc de aceitação/handoff p/ F4.

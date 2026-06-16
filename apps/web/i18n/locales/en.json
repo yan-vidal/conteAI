@@ -1,7 +1,78 @@
 {
+  "$vuetify": {
+    "input": {
+      "appendAction": "append action",
+      "clear": "clear"
+    }
+  },
+  "gallery": {
+    "all": "All",
+    "city": "City",
+    "country": "Country",
+    "date": "Date",
+    "emptyFavoritesText": "Favorite photos appear here first. The full archive is still available.",
+    "emptyFavoritesTitle": "No favorites published",
+    "eyebrow": "Public gallery",
+    "favorites": "Favorites ★",
+    "loadMore": "Load more",
+    "showAllEmpty": "View all photos",
+    "state": "State",
+    "tags": "Tags",
+    "title": "ConteAI Gallery"
+  },
+  "header": {
+    "toggleTheme": "Toggle theme"
+  },
   "home": {
     "eyebrow": "Gallery rebuild",
     "title": "ConteAI Photography",
     "subtitle": "Server-rendered Nuxt foundation for porting the gallery without breaking existing public links."
+  },
+  "list": {
+    "cancel": "Cancel",
+    "city": "City",
+    "close": "Close",
+    "confirmDelete": "Delete image",
+    "country": "Country",
+    "delete": "Delete",
+    "deleteQuestion": "This action removes the image from the archive.",
+    "description": "Description",
+    "edit": "Edit",
+    "editTitle": "Edit image",
+    "eyebrow": "Administration",
+    "favorite": "Favorite",
+    "fullSizeUrl": "Full-size URL",
+    "lazyThumbnail": "Base64 lazy thumbnail",
+    "loadMore": "Load more",
+    "metadata": "Metadata",
+    "optimizedUrl": "Optimized URL",
+    "original": "Original",
+    "save": "Save",
+    "state": "State",
+    "tags": "Tags",
+    "takenAt": "Taken at",
+    "thumbnailUrl": "Thumbnail URL",
+    "title": "Image List",
+    "versionName": "Version",
+    "versions": "Versions"
+  },
+  "login": {
+    "eyebrow": "Restricted access",
+    "name": "User",
+    "password": "Password",
+    "submit": "Sign in"
+  },
+  "upload": {
+    "addVersion": "Add version",
+    "description": "Description",
+    "eyebrow": "Administration",
+    "favorite": "Favorite",
+    "file": "File",
+    "image": "Image",
+    "original": "Original",
+    "sending": "Sending...",
+    "submit": "Send",
+    "title": "Image Upload",
+    "versionName": "Version name"
   }
 }

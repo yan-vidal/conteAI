@@ -1,1 +1,1 @@
-export { default } from "./playwright.legacy.config";
+export { default } from "./playwright.web.config";

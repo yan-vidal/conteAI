@@ -131,6 +131,20 @@ describe("/images (edit and delete)", () => {
     expect(stored?.original.fullSizeUrl).toBe("original-full.jpg");
   });
 
+  it("toggles the favorite flag via patch", async () => {
+    const created = await imageModel.create(makeImage());
+
+    const response = await request(server())
+      .patch(`/images/${String(created._id)}`)
+      .set("Authorization", `Bearer ${token}`)
+      .send({ favorite: true })
+      .expect(200);
+
+    expect(response.body.favorite).toBe(true);
+    const stored = await imageModel.findById(created._id).lean().exec();
+    expect(stored?.favorite).toBe(true);
+  });
+
   it("returns 404 when patching a missing image", async () => {
     await request(server())
       .patch("/images/68b0000000000000000000ff")

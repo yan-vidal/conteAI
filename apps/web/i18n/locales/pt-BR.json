@@ -1,7 +1,78 @@
 {
+  "$vuetify": {
+    "input": {
+      "appendAction": "ação adicional",
+      "clear": "limpar"
+    }
+  },
+  "gallery": {
+    "all": "Todas",
+    "city": "Cidade",
+    "country": "País",
+    "date": "Data",
+    "emptyFavoritesText": "As fotos favoritas aparecem aqui primeiro. Você ainda pode ver o acervo completo.",
+    "emptyFavoritesTitle": "Nenhuma favorita publicada",
+    "eyebrow": "Galeria pública",
+    "favorites": "Favoritas ★",
+    "loadMore": "Carregar mais",
+    "showAllEmpty": "Ver todas as fotos",
+    "state": "Estado",
+    "tags": "Tags",
+    "title": "ConteAI Gallery"
+  },
+  "header": {
+    "toggleTheme": "Alternar tema"
+  },
   "home": {
     "eyebrow": "Galeria em reconstrução",
     "title": "ConteAI Fotografia",
     "subtitle": "Base Nuxt renderizada no servidor para portar a galeria sem quebrar os links públicos existentes."
+  },
+  "list": {
+    "cancel": "Cancelar",
+    "city": "Cidade",
+    "close": "Fechar",
+    "confirmDelete": "Excluir imagem",
+    "country": "País",
+    "delete": "Excluir",
+    "deleteQuestion": "Esta ação remove a imagem do acervo.",
+    "description": "Descrição",
+    "edit": "Editar",
+    "editTitle": "Editar imagem",
+    "eyebrow": "Administração",
+    "favorite": "Favorita",
+    "fullSizeUrl": "URL full-size",
+    "lazyThumbnail": "Thumbnail base64 (lazy)",
+    "loadMore": "Carregar mais",
+    "metadata": "Metadados",
+    "optimizedUrl": "URL otimizada",
+    "original": "Original",
+    "save": "Salvar",
+    "state": "Estado",
+    "tags": "Tags",
+    "takenAt": "Capturada em",
+    "thumbnailUrl": "URL thumbnail",
+    "title": "Lista de Imagens",
+    "versionName": "Versão",
+    "versions": "Versões"
+  },
+  "login": {
+    "eyebrow": "Acesso restrito",
+    "name": "Usuário",
+    "password": "Senha",
+    "submit": "Entrar"
+  },
+  "upload": {
+    "addVersion": "Adicionar versão",
+    "description": "Descrição",
+    "eyebrow": "Administração",
+    "favorite": "Favorita",
+    "file": "Arquivo",
+    "image": "Imagem",
+    "original": "Original",
+    "sending": "Enviando...",
+    "submit": "Enviar",
+    "title": "Upload de Imagens",
+    "versionName": "Nome da versão"
   }
 }

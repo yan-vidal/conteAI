@@ -1,4 +1,10 @@
-import { IsArray, IsObject, IsOptional, IsString } from "class-validator";
+import {
+  IsArray,
+  IsBoolean,
+  IsObject,
+  IsOptional,
+  IsString,
+} from "class-validator";
 
 export interface EditableVersion {
   fullSizeUrl: string;
@@ -31,6 +37,10 @@ export class EditImageDto {
   @IsOptional()
   @IsString()
   city?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  favorite?: boolean;
 
   // Passthrough: persisted via Mongoose casting; URL fields are stripped in the service.
   @IsOptional()

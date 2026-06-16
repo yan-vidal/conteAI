@@ -15,6 +15,7 @@ interface ImageOverrides {
   country?: string;
   takenAt?: Date;
   versionKey?: string;
+  favorite?: boolean;
 }
 
 const makeVersion = (
@@ -42,6 +43,7 @@ const makeImage = (overrides: ImageOverrides = {}): ImageEntity => {
     },
     original: makeVersion(`${key}-original.jpg`, "Original"),
     tags: overrides.tags ?? ["Landscape"],
+    ...(overrides.favorite !== undefined && { favorite: overrides.favorite }),
   };
 };
 
@@ -185,6 +187,23 @@ describe("GET /images", () => {
       (image) => image._id,
     );
     expect(ids).toContain(String(target._id));
+  });
+
+  it("filters by favorite when requested and returns all otherwise", async () => {
+    await imageModel.create([
+      makeImage({ favorite: true, versionKey: "fav" }),
+      makeImage({ favorite: false, versionKey: "plain" }),
+    ]);
+
+    const favorites = await request(server())
+      .get("/images")
+      .query({ favorite: "true" })
+      .expect(200);
+    expect(favorites.body.total).toBe(1);
+    expect(favorites.body.images[0].favorite).toBe(true);
+
+    const all = await request(server()).get("/images").expect(200);
+    expect(all.body.total).toBe(2);
   });
 
   it("returns 404 when the deep-linked id is outside the filtered set", async () => {
